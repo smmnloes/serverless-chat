@@ -9,7 +9,8 @@
     "build": "tsc",
     "watch": "tsc -w",
     "test": "jest",
-    "cdk": "cdk deploy"
+    "cdk": "cdk deploy",
+    "ws-client-test": "ts-node websocket-test/websocket-client.ts"
   },
   "devDependencies": {
     "@types/jest": "^27.5.2",
@@ -26,6 +27,7 @@
   "dependencies": {
     "@aws-cdk/aws-apigatewayv2-alpha": "2.50.0-alpha.0",
     "@aws-cdk/aws-apigatewayv2-integrations-alpha": "2.50.0-alpha.0",
+    "@types/aws-lambda": "8.10.108",
     "aws-cdk-lib": "2.50.0",
     "constructs": "^10.0.0",
     "source-map-support": "^0.5.21",

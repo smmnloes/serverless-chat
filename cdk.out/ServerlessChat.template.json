@@ -41,7 +41,7 @@
      "S3Bucket": {
       "Fn::Sub": "cdk-hnb659fds-assets-${AWS::AccountId}-${AWS::Region}"
      },
-     "S3Key": "0113ad5703c794e86ff6adcf9f2c6dcdd606114ab555313c41961b5fcf1064ed.zip"
+     "S3Key": "dc40b3d42f8f7d827592ae52d42210bfb99d00cbf51dc228561eeba12dd010f4.zip"
     },
     "Role": {
      "Fn::GetAtt": [
@@ -62,7 +62,7 @@
    ],
    "Metadata": {
     "aws:cdk:path": "ServerlessChat/Api/default-handler/Resource",
-    "aws:asset:path": "asset.0113ad5703c794e86ff6adcf9f2c6dcdd606114ab555313c41961b5fcf1064ed",
+    "aws:asset:path": "asset.dc40b3d42f8f7d827592ae52d42210bfb99d00cbf51dc228561eeba12dd010f4",
     "aws:asset:is-bundled": true,
     "aws:asset:property": "Code"
    }
