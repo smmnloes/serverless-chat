@@ -66,6 +66,68 @@
                           "fqn": "aws-cdk-lib.aws_iam.CfnRole",
                           "version": "2.50.0"
                         }
+                      },
+                      "DefaultPolicy": {
+                        "id": "DefaultPolicy",
+                        "path": "ServerlessChat/Api/default-handler/ServiceRole/DefaultPolicy",
+                        "children": {
+                          "Resource": {
+                            "id": "Resource",
+                            "path": "ServerlessChat/Api/default-handler/ServiceRole/DefaultPolicy/Resource",
+                            "attributes": {
+                              "aws:cdk:cloudformation:type": "AWS::IAM::Policy",
+                              "aws:cdk:cloudformation:props": {
+                                "policyDocument": {
+                                  "Statement": [
+                                    {
+                                      "Action": "execute-api:ManageConnections",
+                                      "Effect": "Allow",
+                                      "Resource": {
+                                        "Fn::Join": [
+                                          "",
+                                          [
+                                            "arn:",
+                                            {
+                                              "Ref": "AWS::Partition"
+                                            },
+                                            ":execute-api:",
+                                            {
+                                              "Ref": "AWS::Region"
+                                            },
+                                            ":",
+                                            {
+                                              "Ref": "AWS::AccountId"
+                                            },
+                                            ":",
+                                            {
+                                              "Ref": "ApiWebSocketApi2D925C7A"
+                                            },
+                                            "/*/*/@connections/*"
+                                          ]
+                                        ]
+                                      }
+                                    }
+                                  ],
+                                  "Version": "2012-10-17"
+                                },
+                                "policyName": "ApidefaulthandlerServiceRoleDefaultPolicy466DC3FE",
+                                "roles": [
+                                  {
+                                    "Ref": "ApidefaulthandlerServiceRole88563272"
+                                  }
+                                ]
+                              }
+                            },
+                            "constructInfo": {
+                              "fqn": "aws-cdk-lib.aws_iam.CfnPolicy",
+                              "version": "2.50.0"
+                            }
+                          }
+                        },
+                        "constructInfo": {
+                          "fqn": "aws-cdk-lib.aws_iam.Policy",
+                          "version": "2.50.0"
+                        }
                       }
                     },
                     "constructInfo": {
@@ -109,7 +171,7 @@
                           "s3Bucket": {
                             "Fn::Sub": "cdk-hnb659fds-assets-${AWS::AccountId}-${AWS::Region}"
                           },
-                          "s3Key": "dc40b3d42f8f7d827592ae52d42210bfb99d00cbf51dc228561eeba12dd010f4.zip"
+                          "s3Key": "77eded1138f42ee79fc41b4d1defd1ad0374ed7f906c0c3d2f18474947600f80.zip"
                         },
                         "role": {
                           "Fn::GetAtt": [
@@ -119,7 +181,27 @@
                         },
                         "environment": {
                           "variables": {
-                            "AWS_NODEJS_CONNECTION_REUSE_ENABLED": "1"
+                            "AWS_NODEJS_CONNECTION_REUSE_ENABLED": "1",
+                            "CALLBACK_URL": {
+                              "Fn::Join": [
+                                "",
+                                [
+                                  "https://",
+                                  {
+                                    "Ref": "ApiWebSocketApi2D925C7A"
+                                  },
+                                  ".execute-api.",
+                                  {
+                                    "Ref": "AWS::Region"
+                                  },
+                                  ".",
+                                  {
+                                    "Ref": "AWS::URLSuffix"
+                                  },
+                                  "/prod"
+                                ]
+                              ]
+                            }
                           }
                         },
                         "handler": "index.handler",

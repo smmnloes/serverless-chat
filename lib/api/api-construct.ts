@@ -15,10 +15,14 @@ export class ApiConstruct extends Construct {
             defaultRouteOptions: { integration: new WebSocketLambdaIntegration('DefaultIntegration', defaultHandler) }
         })
 
-        new WebSocketStage(this, 'prod', {
+        const stage = new WebSocketStage(this, 'prod', {
             webSocketApi,
             stageName: 'prod',
             autoDeploy: true,
-          });
+        });
+
+        defaultHandler.addEnvironment('CALLBACK_URL', stage.callbackUrl)
+        
+        webSocketApi.grantManageConnections(defaultHandler)
     }
 }
