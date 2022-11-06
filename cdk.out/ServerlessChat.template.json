@@ -1,9 +1,199 @@
 {
  "Resources": {
+  "ApidefaulthandlerServiceRole88563272": {
+   "Type": "AWS::IAM::Role",
+   "Properties": {
+    "AssumeRolePolicyDocument": {
+     "Statement": [
+      {
+       "Action": "sts:AssumeRole",
+       "Effect": "Allow",
+       "Principal": {
+        "Service": "lambda.amazonaws.com"
+       }
+      }
+     ],
+     "Version": "2012-10-17"
+    },
+    "ManagedPolicyArns": [
+     {
+      "Fn::Join": [
+       "",
+       [
+        "arn:",
+        {
+         "Ref": "AWS::Partition"
+        },
+        ":iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+       ]
+      ]
+     }
+    ]
+   },
+   "Metadata": {
+    "aws:cdk:path": "ServerlessChat/Api/default-handler/ServiceRole/Resource"
+   }
+  },
+  "ApidefaulthandlerF41654D9": {
+   "Type": "AWS::Lambda::Function",
+   "Properties": {
+    "Code": {
+     "S3Bucket": {
+      "Fn::Sub": "cdk-hnb659fds-assets-${AWS::AccountId}-${AWS::Region}"
+     },
+     "S3Key": "0113ad5703c794e86ff6adcf9f2c6dcdd606114ab555313c41961b5fcf1064ed.zip"
+    },
+    "Role": {
+     "Fn::GetAtt": [
+      "ApidefaulthandlerServiceRole88563272",
+      "Arn"
+     ]
+    },
+    "Environment": {
+     "Variables": {
+      "AWS_NODEJS_CONNECTION_REUSE_ENABLED": "1"
+     }
+    },
+    "Handler": "index.handler",
+    "Runtime": "nodejs14.x"
+   },
+   "DependsOn": [
+    "ApidefaulthandlerServiceRole88563272"
+   ],
+   "Metadata": {
+    "aws:cdk:path": "ServerlessChat/Api/default-handler/Resource",
+    "aws:asset:path": "asset.0113ad5703c794e86ff6adcf9f2c6dcdd606114ab555313c41961b5fcf1064ed",
+    "aws:asset:is-bundled": true,
+    "aws:asset:property": "Code"
+   }
+  },
+  "ApiWebSocketApi2D925C7A": {
+   "Type": "AWS::ApiGatewayV2::Api",
+   "Properties": {
+    "Name": "WebSocketApi",
+    "ProtocolType": "WEBSOCKET",
+    "RouteSelectionExpression": "$request.body.action"
+   },
+   "Metadata": {
+    "aws:cdk:path": "ServerlessChat/Api/WebSocketApi/Resource"
+   }
+  },
+  "ApiWebSocketApidefaultRouteDefaultIntegrationPermission0B285520": {
+   "Type": "AWS::Lambda::Permission",
+   "Properties": {
+    "Action": "lambda:InvokeFunction",
+    "FunctionName": {
+     "Fn::GetAtt": [
+      "ApidefaulthandlerF41654D9",
+      "Arn"
+     ]
+    },
+    "Principal": "apigateway.amazonaws.com",
+    "SourceArn": {
+     "Fn::Join": [
+      "",
+      [
+       "arn:",
+       {
+        "Ref": "AWS::Partition"
+       },
+       ":execute-api:",
+       {
+        "Ref": "AWS::Region"
+       },
+       ":",
+       {
+        "Ref": "AWS::AccountId"
+       },
+       ":",
+       {
+        "Ref": "ApiWebSocketApi2D925C7A"
+       },
+       "/*/*$default"
+      ]
+     ]
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "ServerlessChat/Api/WebSocketApi/$default-Route/DefaultIntegration-Permission"
+   }
+  },
+  "ApiWebSocketApidefaultRouteDefaultIntegration6229C15A": {
+   "Type": "AWS::ApiGatewayV2::Integration",
+   "Properties": {
+    "ApiId": {
+     "Ref": "ApiWebSocketApi2D925C7A"
+    },
+    "IntegrationType": "AWS_PROXY",
+    "IntegrationUri": {
+     "Fn::Join": [
+      "",
+      [
+       "arn:",
+       {
+        "Ref": "AWS::Partition"
+       },
+       ":apigateway:",
+       {
+        "Ref": "AWS::Region"
+       },
+       ":lambda:path/2015-03-31/functions/",
+       {
+        "Fn::GetAtt": [
+         "ApidefaulthandlerF41654D9",
+         "Arn"
+        ]
+       },
+       "/invocations"
+      ]
+     ]
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "ServerlessChat/Api/WebSocketApi/$default-Route/DefaultIntegration/Resource"
+   }
+  },
+  "ApiWebSocketApidefaultRoute767187C8": {
+   "Type": "AWS::ApiGatewayV2::Route",
+   "Properties": {
+    "ApiId": {
+     "Ref": "ApiWebSocketApi2D925C7A"
+    },
+    "RouteKey": "$default",
+    "AuthorizationType": "NONE",
+    "Target": {
+     "Fn::Join": [
+      "",
+      [
+       "integrations/",
+       {
+        "Ref": "ApiWebSocketApidefaultRouteDefaultIntegration6229C15A"
+       }
+      ]
+     ]
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "ServerlessChat/Api/WebSocketApi/$default-Route/Resource"
+   }
+  },
+  "Apiprod664BEC2C": {
+   "Type": "AWS::ApiGatewayV2::Stage",
+   "Properties": {
+    "ApiId": {
+     "Ref": "ApiWebSocketApi2D925C7A"
+    },
+    "StageName": "prod",
+    "AutoDeploy": true
+   },
+   "Metadata": {
+    "aws:cdk:path": "ServerlessChat/Api/prod/Resource"
+   }
+  },
   "CDKMetadata": {
    "Type": "AWS::CDK::Metadata",
    "Properties": {
-    "Analytics": "v2:deflate64:H4sIAAAAAAAA/zPSMzXQM1BMLC/WTU7J1s3JTNKrDi5JTM7WcU7LC0otzi8tSk4FsZ3z81IySzLz82p18vJTUvWyivXLDC31DPQMFbOKMzN1i0rzSjJzU/WCIDQAlBPK7VgAAAA="
+    "Analytics": "v2:deflate64:H4sIAAAAAAAA/02QzW6DMBCEnyV3syGpeuitSaRIvVQVOfSIFtjS5cdGrElUWbx7bZOgnMaz+rwz9h5eU3DpBm+SlFWbdFyAu1gsW+VHueuwLyrMtamoEfiMcp50adloxdiDy0xH6vSjg85KXnIUIStwCOI9HKeyJXtEIbVsA+fxdYk/f9HYs4h3s8KBa7R0w7/rPoKHgQPzoS3VIz6uZGayMdZ3rWmeVYwLhnUdARIzjWVkTkZXbOP6NMFu+EVIN+/3J2+DPqfeCfdNxcWE6qHBapbg1T7XWoePTuHXoJHtdfcGKew2jTAn46Qt9wTZov8iQ6NzgQEAAA=="
    },
    "Metadata": {
     "aws:cdk:path": "ServerlessChat/CDKMetadata/Default"

@@ -16,6 +16,321 @@
         "id": "ServerlessChat",
         "path": "ServerlessChat",
         "children": {
+          "Api": {
+            "id": "Api",
+            "path": "ServerlessChat/Api",
+            "children": {
+              "default-handler": {
+                "id": "default-handler",
+                "path": "ServerlessChat/Api/default-handler",
+                "children": {
+                  "ServiceRole": {
+                    "id": "ServiceRole",
+                    "path": "ServerlessChat/Api/default-handler/ServiceRole",
+                    "children": {
+                      "Resource": {
+                        "id": "Resource",
+                        "path": "ServerlessChat/Api/default-handler/ServiceRole/Resource",
+                        "attributes": {
+                          "aws:cdk:cloudformation:type": "AWS::IAM::Role",
+                          "aws:cdk:cloudformation:props": {
+                            "assumeRolePolicyDocument": {
+                              "Statement": [
+                                {
+                                  "Action": "sts:AssumeRole",
+                                  "Effect": "Allow",
+                                  "Principal": {
+                                    "Service": "lambda.amazonaws.com"
+                                  }
+                                }
+                              ],
+                              "Version": "2012-10-17"
+                            },
+                            "managedPolicyArns": [
+                              {
+                                "Fn::Join": [
+                                  "",
+                                  [
+                                    "arn:",
+                                    {
+                                      "Ref": "AWS::Partition"
+                                    },
+                                    ":iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+                                  ]
+                                ]
+                              }
+                            ]
+                          }
+                        },
+                        "constructInfo": {
+                          "fqn": "aws-cdk-lib.aws_iam.CfnRole",
+                          "version": "2.50.0"
+                        }
+                      }
+                    },
+                    "constructInfo": {
+                      "fqn": "aws-cdk-lib.aws_iam.Role",
+                      "version": "2.50.0"
+                    }
+                  },
+                  "Code": {
+                    "id": "Code",
+                    "path": "ServerlessChat/Api/default-handler/Code",
+                    "children": {
+                      "Stage": {
+                        "id": "Stage",
+                        "path": "ServerlessChat/Api/default-handler/Code/Stage",
+                        "constructInfo": {
+                          "fqn": "aws-cdk-lib.AssetStaging",
+                          "version": "2.50.0"
+                        }
+                      },
+                      "AssetBucket": {
+                        "id": "AssetBucket",
+                        "path": "ServerlessChat/Api/default-handler/Code/AssetBucket",
+                        "constructInfo": {
+                          "fqn": "aws-cdk-lib.aws_s3.BucketBase",
+                          "version": "2.50.0"
+                        }
+                      }
+                    },
+                    "constructInfo": {
+                      "fqn": "aws-cdk-lib.aws_s3_assets.Asset",
+                      "version": "2.50.0"
+                    }
+                  },
+                  "Resource": {
+                    "id": "Resource",
+                    "path": "ServerlessChat/Api/default-handler/Resource",
+                    "attributes": {
+                      "aws:cdk:cloudformation:type": "AWS::Lambda::Function",
+                      "aws:cdk:cloudformation:props": {
+                        "code": {
+                          "s3Bucket": {
+                            "Fn::Sub": "cdk-hnb659fds-assets-${AWS::AccountId}-${AWS::Region}"
+                          },
+                          "s3Key": "0113ad5703c794e86ff6adcf9f2c6dcdd606114ab555313c41961b5fcf1064ed.zip"
+                        },
+                        "role": {
+                          "Fn::GetAtt": [
+                            "ApidefaulthandlerServiceRole88563272",
+                            "Arn"
+                          ]
+                        },
+                        "environment": {
+                          "variables": {
+                            "AWS_NODEJS_CONNECTION_REUSE_ENABLED": "1"
+                          }
+                        },
+                        "handler": "index.handler",
+                        "runtime": "nodejs14.x"
+                      }
+                    },
+                    "constructInfo": {
+                      "fqn": "aws-cdk-lib.aws_lambda.CfnFunction",
+                      "version": "2.50.0"
+                    }
+                  }
+                },
+                "constructInfo": {
+                  "fqn": "aws-cdk-lib.aws_lambda_nodejs.NodejsFunction",
+                  "version": "2.50.0"
+                }
+              },
+              "WebSocketApi": {
+                "id": "WebSocketApi",
+                "path": "ServerlessChat/Api/WebSocketApi",
+                "children": {
+                  "Resource": {
+                    "id": "Resource",
+                    "path": "ServerlessChat/Api/WebSocketApi/Resource",
+                    "attributes": {
+                      "aws:cdk:cloudformation:type": "AWS::ApiGatewayV2::Api",
+                      "aws:cdk:cloudformation:props": {
+                        "name": "WebSocketApi",
+                        "protocolType": "WEBSOCKET",
+                        "routeSelectionExpression": "$request.body.action"
+                      }
+                    },
+                    "constructInfo": {
+                      "fqn": "aws-cdk-lib.aws_apigatewayv2.CfnApi",
+                      "version": "2.50.0"
+                    }
+                  },
+                  "$default-Route": {
+                    "id": "$default-Route",
+                    "path": "ServerlessChat/Api/WebSocketApi/$default-Route",
+                    "children": {
+                      "DefaultIntegration-Permission": {
+                        "id": "DefaultIntegration-Permission",
+                        "path": "ServerlessChat/Api/WebSocketApi/$default-Route/DefaultIntegration-Permission",
+                        "attributes": {
+                          "aws:cdk:cloudformation:type": "AWS::Lambda::Permission",
+                          "aws:cdk:cloudformation:props": {
+                            "action": "lambda:InvokeFunction",
+                            "functionName": {
+                              "Fn::GetAtt": [
+                                "ApidefaulthandlerF41654D9",
+                                "Arn"
+                              ]
+                            },
+                            "principal": "apigateway.amazonaws.com",
+                            "sourceArn": {
+                              "Fn::Join": [
+                                "",
+                                [
+                                  "arn:",
+                                  {
+                                    "Ref": "AWS::Partition"
+                                  },
+                                  ":execute-api:",
+                                  {
+                                    "Ref": "AWS::Region"
+                                  },
+                                  ":",
+                                  {
+                                    "Ref": "AWS::AccountId"
+                                  },
+                                  ":",
+                                  {
+                                    "Ref": "ApiWebSocketApi2D925C7A"
+                                  },
+                                  "/*/*$default"
+                                ]
+                              ]
+                            }
+                          }
+                        },
+                        "constructInfo": {
+                          "fqn": "aws-cdk-lib.aws_lambda.CfnPermission",
+                          "version": "2.50.0"
+                        }
+                      },
+                      "DefaultIntegration": {
+                        "id": "DefaultIntegration",
+                        "path": "ServerlessChat/Api/WebSocketApi/$default-Route/DefaultIntegration",
+                        "children": {
+                          "Resource": {
+                            "id": "Resource",
+                            "path": "ServerlessChat/Api/WebSocketApi/$default-Route/DefaultIntegration/Resource",
+                            "attributes": {
+                              "aws:cdk:cloudformation:type": "AWS::ApiGatewayV2::Integration",
+                              "aws:cdk:cloudformation:props": {
+                                "apiId": {
+                                  "Ref": "ApiWebSocketApi2D925C7A"
+                                },
+                                "integrationType": "AWS_PROXY",
+                                "integrationUri": {
+                                  "Fn::Join": [
+                                    "",
+                                    [
+                                      "arn:",
+                                      {
+                                        "Ref": "AWS::Partition"
+                                      },
+                                      ":apigateway:",
+                                      {
+                                        "Ref": "AWS::Region"
+                                      },
+                                      ":lambda:path/2015-03-31/functions/",
+                                      {
+                                        "Fn::GetAtt": [
+                                          "ApidefaulthandlerF41654D9",
+                                          "Arn"
+                                        ]
+                                      },
+                                      "/invocations"
+                                    ]
+                                  ]
+                                }
+                              }
+                            },
+                            "constructInfo": {
+                              "fqn": "aws-cdk-lib.aws_apigatewayv2.CfnIntegration",
+                              "version": "2.50.0"
+                            }
+                          }
+                        },
+                        "constructInfo": {
+                          "fqn": "@aws-cdk/aws-apigatewayv2-alpha.WebSocketIntegration",
+                          "version": "2.50.0-alpha.0"
+                        }
+                      },
+                      "Resource": {
+                        "id": "Resource",
+                        "path": "ServerlessChat/Api/WebSocketApi/$default-Route/Resource",
+                        "attributes": {
+                          "aws:cdk:cloudformation:type": "AWS::ApiGatewayV2::Route",
+                          "aws:cdk:cloudformation:props": {
+                            "apiId": {
+                              "Ref": "ApiWebSocketApi2D925C7A"
+                            },
+                            "routeKey": "$default",
+                            "authorizationType": "NONE",
+                            "target": {
+                              "Fn::Join": [
+                                "",
+                                [
+                                  "integrations/",
+                                  {
+                                    "Ref": "ApiWebSocketApidefaultRouteDefaultIntegration6229C15A"
+                                  }
+                                ]
+                              ]
+                            }
+                          }
+                        },
+                        "constructInfo": {
+                          "fqn": "aws-cdk-lib.aws_apigatewayv2.CfnRoute",
+                          "version": "2.50.0"
+                        }
+                      }
+                    },
+                    "constructInfo": {
+                      "fqn": "@aws-cdk/aws-apigatewayv2-alpha.WebSocketRoute",
+                      "version": "2.50.0-alpha.0"
+                    }
+                  }
+                },
+                "constructInfo": {
+                  "fqn": "@aws-cdk/aws-apigatewayv2-alpha.WebSocketApi",
+                  "version": "2.50.0-alpha.0"
+                }
+              },
+              "prod": {
+                "id": "prod",
+                "path": "ServerlessChat/Api/prod",
+                "children": {
+                  "Resource": {
+                    "id": "Resource",
+                    "path": "ServerlessChat/Api/prod/Resource",
+                    "attributes": {
+                      "aws:cdk:cloudformation:type": "AWS::ApiGatewayV2::Stage",
+                      "aws:cdk:cloudformation:props": {
+                        "apiId": {
+                          "Ref": "ApiWebSocketApi2D925C7A"
+                        },
+                        "stageName": "prod",
+                        "autoDeploy": true
+                      }
+                    },
+                    "constructInfo": {
+                      "fqn": "aws-cdk-lib.aws_apigatewayv2.CfnStage",
+                      "version": "2.50.0"
+                    }
+                  }
+                },
+                "constructInfo": {
+                  "fqn": "@aws-cdk/aws-apigatewayv2-alpha.WebSocketStage",
+                  "version": "2.50.0-alpha.0"
+                }
+              }
+            },
+            "constructInfo": {
+              "fqn": "constructs.Construct",
+              "version": "10.1.151"
+            }
+          },
           "CDKMetadata": {
             "id": "CDKMetadata",
             "path": "ServerlessChat/CDKMetadata",
