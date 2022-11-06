@@ -1,0 +1,19 @@
+{
+  "version": "21.0.0",
+  "files": {
+    "873db7c6e605085e635d6c8992247f11023ca8a1a1c54e61560419cf20fc5d44": {
+      "source": {
+        "path": "ServerlessChat.template.json",
+        "packaging": "file"
+      },
+      "destinations": {
+        "current_account-current_region": {
+          "bucketName": "cdk-hnb659fds-assets-${AWS::AccountId}-${AWS::Region}",
+          "objectKey": "873db7c6e605085e635d6c8992247f11023ca8a1a1c54e61560419cf20fc5d44.json",
+          "assumeRoleArn": "arn:${AWS::Partition}:iam::${AWS::AccountId}:role/cdk-hnb659fds-file-publishing-role-${AWS::AccountId}-${AWS::Region}"
+        }
+      }
+    }
+  },
+  "dockerImages": {}
+}
