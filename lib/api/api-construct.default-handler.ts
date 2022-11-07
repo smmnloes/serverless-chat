@@ -15,6 +15,5 @@ export const handler: APIGatewayProxyWebsocketHandlerV2 = async (event: APIGatew
     await callbackAPI.postToConnection({ ConnectionId: event.requestContext.connectionId, Data: `Recieved number: ${event.body}`}).promise()
     return {
         statusCode: 200,
-        body: "hello client"
     }
 }
