@@ -1,12 +1,12 @@
 import { WSAction } from "./actions"
 
-
-export type SendChatMessage = {
-    action: WSAction.MESSAGE,
-    message: string
+export interface SendMessageContainer {
+    action: WSAction.MESSAGE
+    messageProps: MessageProps
 }
 
-export type RecieveMessage= {
-    reciever: 'all' | string,
-    message: string
+export type MessageProps = {
+    message: string,
+    from: string,
+    to: 'all' | string
 }

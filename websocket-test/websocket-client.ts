@@ -1,6 +1,6 @@
 import { client } from "websocket";
-import * as readline from 'readline'
-import { RecieveMessage, SendChatMessage } from "../lib/websocket-types/chat-message";
+import { SendMessageContainer } from "../lib/websocket-types/chat-message";
+import promptSync from 'prompt-sync';
 
 const ws_client = new client()
 ws_client.on('connect', (connection) => {
@@ -18,17 +18,10 @@ ws_client.on('connect', (connection) => {
     });
 
 
-    const rlInterface = readline.createInterface({
-        input: process.stdin,
-        output: process.stdout
-    })
-    let input: string = ''
-
-    rlInterface.question('Enter message ', message => {
-        input = message
-        connection.sendUTF(JSON.stringify({ action: 'message', message } as SendChatMessage));
-    })
-
+    const prompt = promptSync()
+    const name = prompt('Whats your name?   ')
+    const message = prompt('Enter message!   ')
+    connection.sendUTF(JSON.stringify({ action: 'message', messageProps: {message: message, from: name, to: 'all'} } as SendMessageContainer));
 })
 
 ws_client.connect('wss://n12pfc9wah.execute-api.eu-central-1.amazonaws.com/prod')

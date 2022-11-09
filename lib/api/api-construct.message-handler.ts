@@ -3,7 +3,7 @@ import { ApiGatewayManagementApi, DynamoDB } from 'aws-sdk';
 import { AttributeMap } from 'aws-sdk/clients/dynamodb';
 import { ConnectionTableItem } from '../datamodel/connection-table';
 import { scanComplete } from '../util/dynamodb';
-import { RecieveMessage } from '../websocket-types/chat-message';
+import { MessageProps, SendMessageContainer } from '../websocket-types/chat-message';
 
 export const handler: APIGatewayProxyWebsocketHandlerV2 = async (event: APIGatewayProxyWebsocketEventV2): Promise<APIGatewayProxyResultV2> => {
     console.log(JSON.stringify(event, null, 4))
@@ -16,7 +16,8 @@ export const handler: APIGatewayProxyWebsocketHandlerV2 = async (event: APIGatew
         }
     }
 
-    const incomingMessage = JSON.parse(event.body).message
+    const body = JSON.parse(event.body) as SendMessageContainer
+    const incomingMessage = body.messageProps.message
     const callBackUrl = process.env.CALLBACK_URL || (() => { throw new Error('No callback url supplied') })()
     const connectionTable = process.env.CONNECTION_TABLE || (() => { throw new Error('No connection table name supplied') })()
 
@@ -33,7 +34,7 @@ export const handler: APIGatewayProxyWebsocketHandlerV2 = async (event: APIGatew
         connectedClientIds.map(
             connectionId =>
                 callbackAPI.postToConnection(
-                    { ConnectionId: connectionId, Data: JSON.stringify({ reciever: 'all', message: incomingMessage } as RecieveMessage) }
+                    { ConnectionId: connectionId, Data: JSON.stringify({ from: body.messageProps.from, to: body.messageProps.to, message: incomingMessage } as MessageProps) }
                 ).promise())
     )
     console.log('Posted to connections')

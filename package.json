@@ -17,6 +17,7 @@
     "@types/node": "10.17.27",
     "@types/prettier": "2.6.0",
     "@types/websocket": "1.0.5",
+    "@types/prompt-sync": "4.2.0",
     "aws-cdk": "2.50.0",
     "esbuild": "^0.15.13",
     "jest": "^27.5.1",
@@ -32,6 +33,7 @@
     "constructs": "^10.0.0",
     "source-map-support": "^0.5.21",
     "websocket": "1.0.34",
-    "aws-sdk": "2.1248.0"
+    "aws-sdk": "2.1248.0",
+    "prompt-sync": "4.2.0"
   }
 }
