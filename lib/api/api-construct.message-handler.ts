@@ -1,5 +1,5 @@
 import { APIGatewayProxyWebsocketHandlerV2, APIGatewayProxyWebsocketEventV2, APIGatewayProxyResultV2 } from 'aws-lambda'
-import { ApiGatewayManagementApi, DynamoDB } from 'aws-sdk';
+import { ApiGatewayManagementApi, Connect, DynamoDB } from 'aws-sdk';
 import { AttributeMap } from 'aws-sdk/clients/dynamodb';
 import { ConnectionTableItem } from '../datamodel/connection-table';
 import { scanComplete } from '../util/dynamodb';
@@ -17,7 +17,9 @@ export const handler: APIGatewayProxyWebsocketHandlerV2 = async (event: APIGatew
     }
 
     const body = JSON.parse(event.body) as SendMessageContainer
-    const incomingMessage = body.messageProps.message
+    const messageProps = body.messageProps;
+    const incomingMessage = messageProps.message
+
     const callBackUrl = process.env.CALLBACK_URL || (() => { throw new Error('No callback url supplied') })()
     const connectionTable = process.env.CONNECTION_TABLE || (() => { throw new Error('No connection table name supplied') })()
 
@@ -26,19 +28,47 @@ export const handler: APIGatewayProxyWebsocketHandlerV2 = async (event: APIGatew
         endpoint: callBackUrl
     });
 
-    console.log('Querying connection ids')
-    const connectedClientIds = (await scanComplete({ TableName: connectionTable })).map((item: AttributeMap) => (item as ConnectionTableItem).connectionId)
-    console.log('Connection Ids: ' + connectedClientIds)
-    console.log('Posting to connections')
-    await Promise.all(
-        connectedClientIds.map(
-            connectionId =>
-                callbackAPI.postToConnection(
-                    { ConnectionId: connectionId, Data: JSON.stringify({ from: body.messageProps.from, to: body.messageProps.to, message: incomingMessage } as MessageProps) }
-                ).promise())
-    )
-    console.log('Posted to connections')
-    return { statusCode: 200 }
-}
+    if (messageProps.to === 'all') { return await sendToAll() }
+    else { return await sendToOne() }
 
-const bla: { [key: string]: any } = { connectionId: 123 }
+    async function sendToAll(): Promise<APIGatewayProxyResultV2> {
+        console.log('Querying connection ids');
+        const connectedClientIds = (await scanComplete({ TableName: connectionTable })).map((item: AttributeMap) => (item as ConnectionTableItem).connectionId);
+        console.log('Connection Ids: ' + connectedClientIds);
+        console.log('Posting to connections');
+        await Promise.all(
+            connectedClientIds.map(
+                connectionId => callbackAPI.postToConnection(
+                    { ConnectionId: connectionId, Data: JSON.stringify({ from: messageProps.from, to: messageProps.to, message: incomingMessage } as MessageProps) }
+                ).promise())
+        );
+        console.log('Posted to connections');
+        return { statusCode: 200 };
+    }
+
+    async function sendToOne(): Promise<APIGatewayProxyResultV2> {
+        console.log('Querying connection id for name ' + messageProps.to);
+        const items = (await new DynamoDB.DocumentClient()
+            .query({
+                TableName: connectionTable,
+                IndexName: 'NameIndex',
+                KeyConditionExpression: '#n = :t',
+                ExpressionAttributeNames: { '#n': 'name' },
+                ExpressionAttributeValues: { ':t': messageProps.to }
+            }).promise()).Items;
+
+        if (items === undefined || items.length !== 1) {
+            console.log('Error. Items retrieved was ' + items)
+            return { statusCode: 500, body: JSON.stringify({ error: 'Could not match connectionID to name' }) }
+        }
+        const recipientConnectionId = (items[0] as ConnectionTableItem).connectionId
+        console.log('Recipient connection Id: ' + recipientConnectionId);
+        console.log('Posting to connection');
+        await callbackAPI.postToConnection(
+            { ConnectionId: recipientConnectionId, Data: JSON.stringify({ from: messageProps.from, to: messageProps.to, message: incomingMessage } as MessageProps) }
+        ).promise()
+
+        console.log('Posted to connections');
+        return { statusCode: 200 };
+    }
+}

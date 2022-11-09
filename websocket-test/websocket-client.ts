@@ -20,11 +20,9 @@ ws_client.on('connect', (connection) => {
         }
     });
 
-
-
-
     const message = prompt('Enter message!   ')
-    connection.sendUTF(JSON.stringify({ action: 'message', messageProps: { message: message, from: name, to: 'all' } } as SendMessageContainer));
+    const to = prompt('To who?   ')
+    connection.sendUTF(JSON.stringify({ action: 'message', messageProps: { message, from: name, to } } as SendMessageContainer));
 })
 
 ws_client.connect('wss://n12pfc9wah.execute-api.eu-central-1.amazonaws.com/prod?name=' + name)

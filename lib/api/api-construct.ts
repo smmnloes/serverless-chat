@@ -18,6 +18,11 @@ export class ApiConstruct extends Construct {
             billingMode: BillingMode.PAY_PER_REQUEST
         })
 
+        connectionTable.addGlobalSecondaryIndex({
+            indexName: 'NameIndex',
+            partitionKey: { name: 'name', type: AttributeType.STRING }
+        })
+
         const messageHandler = new NodejsFunction(this, 'message-handler', { environment: { CONNECTION_TABLE: connectionTable.tableName } })
         const connectHandler = new NodejsFunction(this, 'connect-handler', { environment: { CONNECTION_TABLE: connectionTable.tableName } })
         const disconnectHandler = new NodejsFunction(this, 'disconnect-handler', { environment: { CONNECTION_TABLE: connectionTable.tableName } })
