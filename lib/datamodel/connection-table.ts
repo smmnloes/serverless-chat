@@ -1,3 +1,4 @@
 export type ConnectionTableItem = {
-    'connectionId': string
+    connectionId: string
+    name: string
 }

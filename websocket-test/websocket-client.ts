@@ -2,6 +2,9 @@ import { client } from "websocket";
 import { SendMessageContainer } from "../lib/websocket-types/chat-message";
 import promptSync from 'prompt-sync';
 
+const prompt = promptSync()
+const name = prompt('Whats your name?   ')
+
 const ws_client = new client()
 ws_client.on('connect', (connection) => {
     console.log('WebSocket Client Connected');
@@ -18,10 +21,10 @@ ws_client.on('connect', (connection) => {
     });
 
 
-    const prompt = promptSync()
-    const name = prompt('Whats your name?   ')
+
+
     const message = prompt('Enter message!   ')
-    connection.sendUTF(JSON.stringify({ action: 'message', messageProps: {message: message, from: name, to: 'all'} } as SendMessageContainer));
+    connection.sendUTF(JSON.stringify({ action: 'message', messageProps: { message: message, from: name, to: 'all' } } as SendMessageContainer));
 })
 
-ws_client.connect('wss://n12pfc9wah.execute-api.eu-central-1.amazonaws.com/prod')
+ws_client.connect('wss://n12pfc9wah.execute-api.eu-central-1.amazonaws.com/prod?name=' + name)
