@@ -1,6 +1,6 @@
 import { client } from "websocket";
-import { SendMessageContainer } from "../lib/websocket-types/chat-message";
 import promptSync from 'prompt-sync';
+import { SendMessageContainer } from "../../common/websocket-types/chat-message";
 
 const prompt = promptSync()
 const name = prompt('Whats your name?   ')

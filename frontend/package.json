@@ -1,0 +1,28 @@
+{
+  "name": "serverless-chat-frontend",
+  "version": "1.0.0",
+  "description": "Frontend for the serverless chat app",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/smmnloes/serverless-chat.git"
+  },
+  "author": "Maximilian Lösch",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/smmnloes/serverless-chat/issues"
+  },
+  "homepage": "https://github.com/smmnloes/serverless-chat#readme",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "devDependencies": {
+    "@types/node": "18.11.9",
+    "@types/websocket": "1.0.5",
+    "@types/prompt-sync": "4.2.0"
+  },
+  "dependencies": {
+    "prompt-sync": "4.2.0",
+    "websocket": "1.0.34"
+  }
+}
