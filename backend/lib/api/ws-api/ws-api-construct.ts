@@ -19,7 +19,7 @@ export class WSApiConstruct extends Construct {
         const connectHandler = new NodejsFunction(this, 'connect-handler', { environment: { CONNECTION_TABLE_NAME: connectionTableName } })
         const disconnectHandler = new NodejsFunction(this, 'disconnect-handler', { environment: { CONNECTION_TABLE_NAME: connectionTableName } })
         const defaultHandler = new NodejsFunction(this, 'default-handler')
-        props.connectionTable.grantWriteData(connectHandler)
+        props.connectionTable.grantReadWriteData(connectHandler)
         props.connectionTable.grantReadWriteData(disconnectHandler)
         props.connectionTable.grantReadData(messageHandler)
 
