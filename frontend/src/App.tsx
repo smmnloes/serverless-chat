@@ -5,7 +5,7 @@ import ChatContainer from './components/ChatContainer';
 
 function App() {
   return (
-    <ChatContainer message="hey"/>
+    <ChatContainer/>
   );
 }
 
