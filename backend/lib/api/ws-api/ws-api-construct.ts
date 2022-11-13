@@ -38,6 +38,10 @@ export class WSApiConstruct extends Construct {
             webSocketApi,
             stageName: 'prod',
             autoDeploy: true,
+            throttle: {
+                rateLimit: 10,
+                burstLimit: 20
+            }
         });
 
         messageHandler.addEnvironment('CALLBACK_URL', stage.callbackUrl)
