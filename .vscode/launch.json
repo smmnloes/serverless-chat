@@ -17,7 +17,8 @@
             ],
             "cwd": "${fileDirname}",
             "protocol": "inspector",
-            "internalConsoleOptions": "openOnSessionStart"
+            "internalConsoleOptions": "openOnSessionStart",
+            "console": "integratedTerminal"
         }
     ]
 }

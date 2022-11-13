@@ -13,6 +13,7 @@
     "prompt-sync": "4.2.0",
     "websocket": "1.0.34",
     "react": "^18.2.0",
+    "react-router": "6.4.3",
     "react-dom": "^18.2.0",
     "react-scripts": "5.0.1",
     "typescript": "^4.8.4",
