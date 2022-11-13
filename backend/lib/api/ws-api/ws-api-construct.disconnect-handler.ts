@@ -1,5 +1,5 @@
-import { APIGatewayProxyWebsocketHandlerV2, APIGatewayProxyWebsocketEventV2, APIGatewayProxyResultV2, APIGatewayProxyEvent } from 'aws-lambda'
-import { ApiGatewayManagementApi, DynamoDB } from 'aws-sdk';
+import { APIGatewayProxyEvent, APIGatewayProxyResultV2 } from 'aws-lambda';
+import { DynamoDB } from 'aws-sdk';
 
 
 export const handler = async (event: APIGatewayProxyEvent): Promise<APIGatewayProxyResultV2> => {

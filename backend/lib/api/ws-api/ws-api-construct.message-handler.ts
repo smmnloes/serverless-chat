@@ -1,9 +1,9 @@
 import { APIGatewayProxyWebsocketHandlerV2, APIGatewayProxyWebsocketEventV2, APIGatewayProxyResultV2 } from 'aws-lambda'
 import { ApiGatewayManagementApi, Connect, DynamoDB } from 'aws-sdk';
 import { AttributeMap } from 'aws-sdk/clients/dynamodb';
-import { ConnectionTableItem } from '../datamodel/connection-table';
-import { scanComplete } from '../util/dynamodb';
-import { MessageProps, SendMessageContainer } from '../../../common/websocket-types/chat-message';
+import { MessageProps, SendMessageContainer } from '../../../../common/websocket-types/chat-message';
+import { ConnectionTableItem } from '../../datamodel/connection-table';
+import { scanComplete } from '../../util/dynamodb';
 
 export const handler: APIGatewayProxyWebsocketHandlerV2 = async (event: APIGatewayProxyWebsocketEventV2): Promise<APIGatewayProxyResultV2> => {
     console.log(JSON.stringify(event, null, 4))

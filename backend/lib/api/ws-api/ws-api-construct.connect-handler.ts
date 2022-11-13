@@ -1,6 +1,6 @@
 import { APIGatewayProxyResultV2, APIGatewayProxyEvent } from 'aws-lambda'
 import { DynamoDB } from 'aws-sdk';
-import { ConnectionTableItem } from '../datamodel/connection-table';
+import { ConnectionTableItem } from '../../datamodel/connection-table';
 
 
 export const handler = async (event: APIGatewayProxyEvent): Promise<APIGatewayProxyResultV2> => {
