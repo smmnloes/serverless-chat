@@ -1,12 +1,16 @@
-import React, { SetStateAction, useState } from 'react';
-import { CurrentView } from './ChatContainer';
-import './WelcomeView.css'
+import React from 'react';
+import { useLocation } from 'react-router';
+import { Link } from 'react-router-dom';
+import './ChatView.css';
 
-function ChatView(props: { nextView: React.Dispatch<SetStateAction<CurrentView>> }) {
+function ChatView() {
+  const location = useLocation()
+  const { name } = location.state
+  console.log(name)
   return (
-    <div>
-      <p>Chat</p>
-      <button onClick={() => props.nextView(CurrentView.WELCOME)}>ChangeView</button>
+    <div className="ChatView">
+      <p>Name: {name || 'No name given'}</p>
+      <Link to="/"><button>Go to Welcome View</button></Link>
     </div>
   );
 }

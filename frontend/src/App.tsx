@@ -1,11 +1,15 @@
 import React from 'react';
-import logo from './logo.svg';
+import { Route, Routes } from 'react-router-dom';
 import './App.css';
-import ChatContainer from './components/ChatContainer';
+import ChatView from './components/ChatView';
+import WelcomeView from './components/WelcomeView';
 
 function App() {
   return (
-    <ChatContainer/>
+    <Routes>
+      <Route path="/" element={<WelcomeView />} />
+      <Route path="/chat" element={<ChatView />} />
+    </Routes>
   );
 }
 
