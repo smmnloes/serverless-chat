@@ -21,7 +21,7 @@ export const handler: APIGatewayProxyWebsocketHandlerV2 = async (event: APIGatew
     const incomingMessage = messageProps.message
 
     const callBackUrl = process.env.CALLBACK_URL || (() => { throw new Error('No callback url supplied') })()
-    const connectionTable = process.env.CONNECTION_TABLE || (() => { throw new Error('No connection table name supplied') })()
+    const connectionTable = process.env.CONNECTION_TABLE_NAME || (() => { throw new Error('No connection table name supplied') })()
 
     const callbackAPI = new ApiGatewayManagementApi({
         apiVersion: '2018-11-29',

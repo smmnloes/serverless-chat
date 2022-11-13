@@ -15,9 +15,9 @@ export class WSApiConstruct extends Construct {
 
 
         const connectionTableName = props.connectionTable.tableName;
-        const messageHandler = new NodejsFunction(this, 'message-handler', { environment: { CONNECTION_TABLE: connectionTableName } })
-        const connectHandler = new NodejsFunction(this, 'connect-handler', { environment: { CONNECTION_TABLE: connectionTableName } })
-        const disconnectHandler = new NodejsFunction(this, 'disconnect-handler', { environment: { CONNECTION_TABLE: connectionTableName } })
+        const messageHandler = new NodejsFunction(this, 'message-handler', { environment: { CONNECTION_TABLE_NAME: connectionTableName } })
+        const connectHandler = new NodejsFunction(this, 'connect-handler', { environment: { CONNECTION_TABLE_NAME: connectionTableName } })
+        const disconnectHandler = new NodejsFunction(this, 'disconnect-handler', { environment: { CONNECTION_TABLE_NAME: connectionTableName } })
         const defaultHandler = new NodejsFunction(this, 'default-handler')
         props.connectionTable.grantWriteData(connectHandler)
         props.connectionTable.grantReadWriteData(disconnectHandler)
@@ -46,9 +46,10 @@ export class WSApiConstruct extends Construct {
 
         messageHandler.addEnvironment('CALLBACK_URL', stage.callbackUrl)
 
-        const domainName = new DomainName(this, 'DomainName', { domainName: 'chat-ws-api.mloesch.it', certificate: props.certificate });
+        const recordName = 'chat-ws-api.mloesch.it';
+        const domainName = new DomainName(this, 'DomainName', { domainName: recordName, certificate: props.certificate });
 
-        new ApiMapping(this, 'ApiMapping', { api: webSocketApi, domainName, stage })
-        new route53.ARecord(this, 'apiArecord', { target: RecordTarget.fromAlias(new targets.ApiGatewayv2DomainProperties(domainName.regionalDomainName, domainName.regionalHostedZoneId)), zone: props.hostedZone, recordName: 'chat-ws-api.mloesch.it' })
+        new ApiMapping(this, 'Mapping', { api: webSocketApi, domainName, stage })
+        new route53.ARecord(this, 'Arecord', { target: RecordTarget.fromAlias(new targets.ApiGatewayv2DomainProperties(domainName.regionalDomainName, domainName.regionalHostedZoneId)), zone: props.hostedZone, recordName })
     }
 }
