@@ -9,13 +9,13 @@
             "type": "node",
             "request": "launch",
             "args": [
-                "${relativeFile}"
+                "${file}"
             ],
             "runtimeArgs": [
                 "-r",
                 "ts-node/register"
             ],
-            "cwd": "${workspaceRoot}",
+            "cwd": "${fileDirname}",
             "protocol": "inspector",
             "internalConsoleOptions": "openOnSessionStart"
         }

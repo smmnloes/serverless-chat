@@ -24,5 +24,8 @@ ws_client.on('connect', (connection) => {
     const to = prompt('To who?   ')
     connection.sendUTF(JSON.stringify({ action: 'message', messageProps: { message, from: name, to } } as SendMessageContainer));
 })
+ws_client.on('connectFailed', (reason) => {
+    console.log(reason)
+})
 
-ws_client.connect('wss://n12pfc9wah.execute-api.eu-central-1.amazonaws.com/prod?name=' + name)
+ws_client.connect('wss://chat-ws-api.mloesch.it/?name=' + name)

@@ -7,6 +7,6 @@ export class ServerlessChatStack extends cdk.Stack {
   constructor(scope: Construct, id: string, props?: cdk.StackProps) {
     super(scope, id, props);
 
-    new ApiConstruct(this, 'Api')
+    const apiConstruct = new ApiConstruct(this, 'Api')
   }
 }
