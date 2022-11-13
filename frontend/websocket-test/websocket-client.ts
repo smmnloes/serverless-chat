@@ -1,6 +1,7 @@
 import promptSync from 'prompt-sync';
 import { Message } from 'websocket';
 import { Listeners, WebsocketService } from '../src/services/websocket-service';
+
 const prompt = promptSync()
 const name = prompt('Whats your name?   ')
 
@@ -19,8 +20,7 @@ const name = prompt('Whats your name?   ')
 //         }
 //     });
 
-//     const message = prompt('Enter message!   ')
-//     const to = prompt('To who?   ')
+//     
 //     connection.sendUTF(JSON.stringify({ action: 'message', messageProps: { message, from: name, to } } as SendMessageContainer));
 // })
 // ws_client.on('connectFailed', (reason) => {
@@ -50,7 +50,7 @@ async function doIt() {
     console.log('Connected')
     const message = prompt('Enter message!   ')
     const to = prompt('To who?   ')
-    connection.sendUTF(JSON.stringify({ action: 'message', messageProps: { message, from: name, to } }));
+    connection.sendUTF(JSON.stringify({ action: 'message', messageProps: { message , from: name , to: to } }));
 }
 
 doIt()
