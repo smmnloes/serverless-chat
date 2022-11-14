@@ -7,7 +7,12 @@ import * as targets from "aws-cdk-lib/aws-route53-targets";
 import { Construct } from "constructs";
 
 export class RestApiConstruct extends Construct {
-    constructor(scope: Construct, id: string, props: { certificate: ICertificate, hostedZone: IHostedZone, connectionTable: Table }) {
+    constructor(scope: Construct, id: string, props: {
+        certificate: ICertificate,
+        hostedZone: IHostedZone,
+        connectionTable: Table,
+        messagesTable: Table
+    }) {
         super(scope, id)
 
         const recordName = 'chat-rest-api.mloesch.it';
@@ -18,7 +23,7 @@ export class RestApiConstruct extends Construct {
         })
         new ARecord(this, 'Arecord', { target: RecordTarget.fromAlias(new targets.ApiGateway(restApi)), zone: props.hostedZone, recordName })
 
-        const getAllConnectedUsersHandler = new NodejsFunction(this, 'get-connected-users-handler', {environment: {CONNECTION_TABLE_NAME: props.connectionTable.tableName}})
+        const getAllConnectedUsersHandler = new NodejsFunction(this, 'get-connected-users-handler', { environment: { CONNECTION_TABLE_NAME: props.connectionTable.tableName } })
         props.connectionTable.grantReadData(getAllConnectedUsersHandler)
         restApi.root.addResource('user').addMethod('GET', new LambdaIntegration(getAllConnectedUsersHandler))
     }

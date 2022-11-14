@@ -3,7 +3,9 @@ import { ApiGatewayManagementApi, Connect, DynamoDB } from 'aws-sdk';
 import { AttributeMap } from 'aws-sdk/clients/dynamodb';
 import { MessageProps, SendMessageContainer } from '../../../../common/websocket-types/chat-message';
 import { ConnectionTableItem } from '../../datamodel/connection-table';
+import { MessagesTable } from '../../datamodel/messages-table';
 import { scanComplete } from '../../util/dynamodb';
+import { randomUUID } from 'crypto'
 
 export const handler: APIGatewayProxyWebsocketHandlerV2 = async (event: APIGatewayProxyWebsocketEventV2): Promise<APIGatewayProxyResultV2> => {
     console.log(JSON.stringify(event, null, 4))
@@ -22,11 +24,24 @@ export const handler: APIGatewayProxyWebsocketHandlerV2 = async (event: APIGatew
 
     const callBackUrl = process.env.CALLBACK_URL || (() => { throw new Error('No callback url supplied') })()
     const connectionTable = process.env.CONNECTION_TABLE_NAME || (() => { throw new Error('No connection table name supplied') })()
+    const messagesTable = process.env.MESSAGES_TABLE_NAME || (() => { throw new Error('No messages table name supplied') })()
+
+
 
     const callbackAPI = new ApiGatewayManagementApi({
         apiVersion: '2018-11-29',
         endpoint: callBackUrl
     });
+
+    const documentClient = new DynamoDB.DocumentClient();
+    await documentClient.put({
+        TableName: messagesTable, Item: {
+            id: randomUUID(),
+            sentAt: new Date().toISOString(),
+            from: messageProps.from,
+            to: messageProps.to
+        } as MessagesTable
+    }).promise()
 
     if (messageProps.to === 'all') { return await sendToAll() }
     else { return await sendToOne() }
@@ -48,7 +63,8 @@ export const handler: APIGatewayProxyWebsocketHandlerV2 = async (event: APIGatew
 
     async function sendToOne(): Promise<APIGatewayProxyResultV2> {
         console.log('Querying connection id for name ' + messageProps.to);
-        const items = (await new DynamoDB.DocumentClient()
+
+        const items = (await documentClient
             .query({
                 TableName: connectionTable,
                 IndexName: 'NameIndex',

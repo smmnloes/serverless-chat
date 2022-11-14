@@ -10,18 +10,25 @@ import { IHostedZone, RecordTarget } from "aws-cdk-lib/aws-route53";
 import * as targets from "aws-cdk-lib/aws-route53-targets"
 
 export class WSApiConstruct extends Construct {
-    constructor(scope: Construct, id: string, props: { connectionTable: Table, hostedZone: IHostedZone, certificate: ICertificate }) {
+    constructor(scope: Construct, id: string, props: {
+        connectionTable: Table,
+        messagesTable: Table,
+        hostedZone: IHostedZone,
+        certificate: ICertificate
+    }) {
         super(scope, id)
 
 
         const connectionTableName = props.connectionTable.tableName;
-        const messageHandler = new NodejsFunction(this, 'message-handler', { environment: { CONNECTION_TABLE_NAME: connectionTableName } })
+        const messagesTableName = props.messagesTable.tableName;
+        const messageHandler = new NodejsFunction(this, 'message-handler', { environment: { CONNECTION_TABLE_NAME: connectionTableName, MESSAGES_TABLE_NAME: messagesTableName } })
         const connectHandler = new NodejsFunction(this, 'connect-handler', { environment: { CONNECTION_TABLE_NAME: connectionTableName } })
         const disconnectHandler = new NodejsFunction(this, 'disconnect-handler', { environment: { CONNECTION_TABLE_NAME: connectionTableName } })
         const defaultHandler = new NodejsFunction(this, 'default-handler')
         props.connectionTable.grantReadWriteData(connectHandler)
         props.connectionTable.grantReadWriteData(disconnectHandler)
         props.connectionTable.grantReadData(messageHandler)
+        props.messagesTable.grantWriteData(messageHandler)
 
         const webSocketApi = new WebSocketApi(this, 'WebSocketApi', {
             routeSelectionExpression: '$request.body.action',

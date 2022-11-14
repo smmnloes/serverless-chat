@@ -7,9 +7,12 @@ export interface Listeners {
 }
 
 export class WebsocketService {
-   readonly websocketClient 
-    constructor() {
+   readonly websocketClient
+   readonly url
+    
+    constructor(url: string) {
         this.websocketClient = new client()
+        this.url = url
     }
 
     public async connect (listeners: Listeners): Promise<connection> {
@@ -23,7 +26,7 @@ export class WebsocketService {
             this.websocketClient.on('connectFailed', (error) => {
                 reject(error)
             })
-            this.websocketClient.connect('wss://chat-ws-api.mloesch.it/?name=Frank')
+            this.websocketClient.connect(this.url)
         }) 
     }
 }
