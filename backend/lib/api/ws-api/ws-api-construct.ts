@@ -1,13 +1,13 @@
 import { ApiMapping, DomainName, WebSocketApi, WebSocketStage } from "@aws-cdk/aws-apigatewayv2-alpha";
 import { WebSocketLambdaIntegration } from "@aws-cdk/aws-apigatewayv2-integrations-alpha";
+import { aws_route53 as route53 } from "aws-cdk-lib";
+import { ICertificate } from "aws-cdk-lib/aws-certificatemanager";
 import { Table } from "aws-cdk-lib/aws-dynamodb";
 import { NodejsFunction } from "aws-cdk-lib/aws-lambda-nodejs";
-import { Construct } from "constructs";
-import { aws_route53 as route53 } from "aws-cdk-lib";
-import { aws_certificatemanager as certificatemanager } from "aws-cdk-lib";
-import { CertificateValidation, ICertificate } from "aws-cdk-lib/aws-certificatemanager";
+import { RetentionDays } from "aws-cdk-lib/aws-logs";
 import { IHostedZone, RecordTarget } from "aws-cdk-lib/aws-route53";
-import * as targets from "aws-cdk-lib/aws-route53-targets"
+import * as targets from "aws-cdk-lib/aws-route53-targets";
+import { Construct } from "constructs";
 
 export class WSApiConstruct extends Construct {
     constructor(scope: Construct, id: string, props: {
@@ -21,10 +21,10 @@ export class WSApiConstruct extends Construct {
 
         const connectionTableName = props.connectionTable.tableName;
         const messagesTableName = props.messagesTable.tableName;
-        const messageHandler = new NodejsFunction(this, 'message-handler', { environment: { CONNECTION_TABLE_NAME: connectionTableName, MESSAGES_TABLE_NAME: messagesTableName } })
-        const connectHandler = new NodejsFunction(this, 'connect-handler', { environment: { CONNECTION_TABLE_NAME: connectionTableName } })
-        const disconnectHandler = new NodejsFunction(this, 'disconnect-handler', { environment: { CONNECTION_TABLE_NAME: connectionTableName } })
-        const defaultHandler = new NodejsFunction(this, 'default-handler')
+        const messageHandler = new NodejsFunction(this, 'message-handler', { environment: { CONNECTION_TABLE_NAME: connectionTableName, MESSAGES_TABLE_NAME: messagesTableName }, logRetention: RetentionDays.ONE_MONTH })
+        const connectHandler = new NodejsFunction(this, 'connect-handler', { environment: { CONNECTION_TABLE_NAME: connectionTableName }, logRetention: RetentionDays.ONE_MONTH })
+        const disconnectHandler = new NodejsFunction(this, 'disconnect-handler', { environment: { CONNECTION_TABLE_NAME: connectionTableName }, logRetention: RetentionDays.ONE_MONTH })
+        const defaultHandler = new NodejsFunction(this, 'default-handler', { logRetention: RetentionDays.ONE_MONTH })
         props.connectionTable.grantReadWriteData(connectHandler)
         props.connectionTable.grantReadWriteData(disconnectHandler)
         props.connectionTable.grantReadData(messageHandler)
