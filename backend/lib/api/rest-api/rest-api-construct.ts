@@ -24,7 +24,10 @@ export class RestApiConstruct extends Construct {
         new ARecord(this, 'Arecord', { target: RecordTarget.fromAlias(new targets.ApiGateway(restApi)), zone: props.hostedZone, recordName })
 
         const getAllConnectedUsersHandler = new NodejsFunction(this, 'get-connected-users-handler', { environment: { CONNECTION_TABLE_NAME: props.connectionTable.tableName } })
+        const getAllMessagesHandler = new NodejsFunction(this, 'get-all-messages-handler', { environment: { MESSAGES_TABLE_NAME: props.messagesTable.tableName } })
         props.connectionTable.grantReadData(getAllConnectedUsersHandler)
+        props.messagesTable.grantReadData(getAllMessagesHandler)
         restApi.root.addResource('user').addMethod('GET', new LambdaIntegration(getAllConnectedUsersHandler))
+        restApi.root.addResource('message').addMethod('GET', new LambdaIntegration(getAllMessagesHandler))
     }
 }

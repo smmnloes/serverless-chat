@@ -1,1 +1,0 @@
-- Check that name is not undefined in front and backend
