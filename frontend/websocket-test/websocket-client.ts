@@ -1,13 +1,12 @@
 import promptSync from 'prompt-sync';
 import { Message } from 'websocket';
-import { Listeners, WebsocketService } from '../src/services/websocket-service';
+import { Listeners, webSocketService } from '../src/services/websocket-service';
 
 
 async function doIt() {
     const prompt = promptSync()
     const name = prompt('Whats your name?   ')
 
-    const webSocketService = new WebsocketService('wss://chat-ws-api.mloesch.it/?name='+name)
     const listeners: Listeners = {
         onError: function (err: Error): void {
             console.log(err);
@@ -19,13 +18,18 @@ async function doIt() {
             if (data.type === 'utf8') {
                 console.log(data.utf8Data);
             }
+        },
+        onConnected: function (connection): void {
+            console.log('Connected')
+            const message = prompt('Enter message!   ')
+            const to = prompt('To who?   ')
+            connection.sendUTF(JSON.stringify({ action: 'message', messageProps: { message, from: name, to: to } }));
         }
+
     }
-    const connection = await webSocketService.connect(listeners)
-    console.log('Connected')
-    const message = prompt('Enter message!   ')
-    const to = prompt('To who?   ')
-    connection.sendUTF(JSON.stringify({ action: 'message', messageProps: { message , from: name , to: to } }));
+
+    const connection = webSocketService('wss://chat-ws-api.mloesch.it/?name=' + name, listeners)
+
 }
 
 doIt()
