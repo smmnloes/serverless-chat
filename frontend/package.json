@@ -38,7 +38,7 @@
     "build": "react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject",
-    "ws-client-test": "node -r ts-node/register websocket-test/websocket-client.ts"
+    "ws-client-test": "node -r ts-node/register websocket-test/websocket-client-test.ts"
   },
   "eslintConfig": {
     "extends": [
