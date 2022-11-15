@@ -1,8 +1,6 @@
-import React, { SetStateAction, useState } from 'react';
-import { Route, Routes } from 'react-router';
-import { BrowserRouter, Link } from 'react-router-dom';
-import ChatView from './ChatView';
-import './WelcomeView.css'
+import React, { useState } from 'react';
+import { Link } from 'react-router-dom';
+import './WelcomeView.css';
 
 function WelcomeView() {
   const [name, newName] = useState("")
