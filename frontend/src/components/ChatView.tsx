@@ -32,13 +32,15 @@ function ChatView() {
 
         client.onmessage = (message) => setMessages(prev => {
             console.log("recieved message "+JSON.stringify(message.data))
-            prev.push(message.data as string);
-            return prev
+
+            const newMessages = [...prev, message.data as string];
+            console.log("messages" + JSON.stringify(newMessages))
+            return newMessages
         })
 
         client.onclose = (close) => console.log(close.reason)
         client.onopen = () => {
-            console.log('connectedd');
+            console.log('connected');
             waitForConnection()
 
             // wait for connection
@@ -85,7 +87,7 @@ function ChatView() {
         <label htmlFor="messageFor">To who</label><input id="messageFor" type="text"
                                                          onChange={messageForChangeHandler}/>
         <button id="messageSend" onClick={sendMessageClickHandler}>Send</button>
-        <span id="messageDisplay">Messages: {"\n"}{messages.join('\n')}</span>
+        <p>{messages}</p>
         <Link to="/">
             <button>Go to Welcome View</button>
         </Link>
