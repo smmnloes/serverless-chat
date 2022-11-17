@@ -4,7 +4,7 @@ import './WelcomeView.css';
 
 function WelcomeView() {
   const [name, newName] = useState("")
-  const handleInput = (event: React.ChangeEvent<HTMLInputElement>) => {newName(event.target.value); console.log(name)}
+  const handleInput = (event: React.ChangeEvent<HTMLInputElement>) => {newName(event.target.value)}
 
   return (
     <div className='WelcomeView'>
