@@ -15,5 +15,6 @@ export type RecieveMessageProps = {
     message: string,
     from: string,
     to: string,
-    sentAt: string
+    sentAt: string,
+    messageId: string
 }
