@@ -3,7 +3,7 @@ import {DynamoDB} from 'aws-sdk';
 import {MessagesTable} from "../../datamodel/messages-table";
 import {sortByStringDesc} from "../../util/sort";
 
-const MAX_MESSAGES_LIMIT = 5
+const MAX_MESSAGES_LIMIT = 30
 
 export const handler = async (): Promise<APIGatewayProxyResultV2> => {
     const messagesTable = process.env.MESSAGES_TABLE_NAME || (() => {
