@@ -2,11 +2,12 @@ import React, {useEffect, useState} from 'react';
 import {useLocation} from 'react-router';
 import {Link} from 'react-router-dom';
 import './ChatView.css';
-import {w3cwebsocket} from "websocket";
+import {IMessageEvent, w3cwebsocket} from "websocket";
 import {RecieveMessageProps} from "../../../common/websocket-types/chat-message";
 import {messageTransformer} from "../services/messageTransformer";
+import {websocketService} from "../services/websocket-service";
 
-enum ConnectionStatus {
+export enum ConnectionStatus {
     CONNECTED = 'connected', DISCONNECTED = 'disconnected', CONNECTING = 'connecting...'
 }
 
@@ -23,12 +24,13 @@ function ChatView() {
         setMessage(e.currentTarget.value)
     }
 
-
+    const url = 'wss://chat-ws-api.mloesch.it'
     // Init websocket connection
     useEffect(() => {
-        const client: w3cwebsocket = new w3cwebsocket('wss://chat-ws-api.mloesch.it/?name=' + name)
 
-        client.onmessage = (message) => {
+        const onerror = (error: Error) => console.log(error)
+
+        const onmessage = (message: IMessageEvent) => {
             setMessages(prev => {
                 console.log("recieved message " + JSON.stringify(message.data))
                 if (typeof message.data === "string") {
@@ -40,41 +42,15 @@ function ChatView() {
             })
             // scroll down in div
             const messgeViewDiv = document.getElementById('MessageView');
-            if (messgeViewDiv){
+            if (messgeViewDiv) {
                 messgeViewDiv.scrollTop = messgeViewDiv.scrollHeight
             }
 
         }
+        return websocketService(url, name, onmessage, onerror, setWebsocketClient, setConnectionStatus)
 
-        client.onerror = error => console.log(error)
-        client.onclose = () => console.log('Connection closed')
-        client.onopen = () => {
-            console.log('connected');
-            waitForConnection()
-
-            // wait for connection
-            function waitForConnection() {
-                console.log('Waiting for client to be ready')
-                setConnectionStatus(ConnectionStatus.CONNECTING)
-                if (client.readyState === w3cwebsocket.OPEN) {
-                    console.log('client ready! proceeding')
-                    setConnectionStatus(ConnectionStatus.CONNECTED)
-                } else {
-                    setTimeout(waitForConnection, 1000)
-                }
-            }
-
-            setWebsocketClient(client)
-        }
-        return function cleanup() {
-            client.close()
-        }
     }, [])
 
-    // Display messages
-    useEffect(() => {
-
-    }, [messages])
 
     function sendMessageClickHandler() {
         console.log("sending message")
