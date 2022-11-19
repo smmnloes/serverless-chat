@@ -12,3 +12,13 @@
     margin-left: 0.5rem;
 }
 
+.MessageView {
+    width: 80%;
+    height: 10rem;
+    overflow-y: auto;
+    border: 5px solid green;
+    margin: 2rem auto 2rem auto;
+    text-align: left;
+    padding: 1rem;
+
+}

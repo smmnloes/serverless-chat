@@ -10,3 +10,10 @@ export type MessageProps = {
     from: string,
     to: 'all' | string
 }
+
+export type RecieveMessageProps = {
+    message: string,
+    from: string,
+    to: string,
+    sentAt: string
+}

@@ -3,6 +3,7 @@ import {useLocation} from 'react-router';
 import {Link} from 'react-router-dom';
 import './ChatView.css';
 import {w3cwebsocket} from "websocket";
+import {RecieveMessageProps} from "../../../common/websocket-types/chat-message";
 
 enum ConnectionStatus {
     CONNECTED = 'connected', DISCONNECTED = 'disconnected', CONNECTING = 'connecting...'
@@ -15,30 +16,29 @@ function ChatView() {
     const [connectionStatus, setConnectionStatus] = useState(ConnectionStatus.DISCONNECTED)
     const [websocketClient, setWebsocketClient] = useState<w3cwebsocket | null>(null)
     const [message, setMessage] = useState("")
-    const [messageFor, setMessageFor] = useState("")
-    const [messages, setMessages] = useState<string[]>([])
+    const [messages, setMessages] = useState<RecieveMessageProps[]>([])
 
     function messageChangeHandler(e: React.FormEvent<HTMLInputElement>) {
         setMessage(e.currentTarget.value)
     }
 
-    function messageForChangeHandler(e: React.FormEvent<HTMLInputElement>) {
-        setMessageFor(e.currentTarget.value)
-    }
 
     // Init websocket connection
     useEffect(() => {
         const client: w3cwebsocket = new w3cwebsocket('wss://chat-ws-api.mloesch.it/?name=' + name)
 
         client.onmessage = (message) => setMessages(prev => {
-            console.log("recieved message "+JSON.stringify(message.data))
-
-            const newMessages = [...prev, message.data as string];
-            console.log("messages" + JSON.stringify(newMessages))
-            return newMessages
+            console.log("recieved message " + JSON.stringify(message.data))
+            if (typeof message.data === "string") {
+                return [...prev, JSON.parse(message.data) as RecieveMessageProps]
+            } else {
+                console.log("Unknown messge format")
+                return prev
+            }
         })
 
-        client.onclose = (close) => console.log(close.reason)
+        client.onerror = error => console.log(error)
+        client.onclose = () => console.log('Connection closed')
         client.onopen = () => {
             console.log('connected');
             waitForConnection()
@@ -54,9 +54,10 @@ function ChatView() {
                     setTimeout(waitForConnection, 1000)
                 }
             }
+
             setWebsocketClient(client)
         }
-        return function cleanup () {
+        return function cleanup() {
             client.close()
         }
     }, [])
@@ -71,23 +72,23 @@ function ChatView() {
         if (websocketClient) {
             console.log("websocketclient initialized")
             websocketClient.send(JSON.stringify({
-                action: 'message',
-                messageProps: {message, from: name, to: messageFor}
+                action: 'message', messageProps: {message, from: name, to: 'all'}
             }))
         } else {
             console.log("client not initialized")
         }
 
     }
+
     return (<div className="ChatView">
         <p>Name: {name || 'No name given'}</p>
         <p>Connection status: {connectionStatus}</p>
+        <div className="MessageView">
+            <ul>{messages.map(messageTransformer)}</ul>
+        </div>
         <label htmlFor="messageInput">Your Message</label><input id="messageInput" type="text"
                                                                  onChange={messageChangeHandler}/>
-        <label htmlFor="messageFor">To who</label><input id="messageFor" type="text"
-                                                         onChange={messageForChangeHandler}/>
         <button id="messageSend" onClick={sendMessageClickHandler}>Send</button>
-        <p>{messages}</p>
         <Link to="/">
             <button>Go to Welcome View</button>
         </Link>

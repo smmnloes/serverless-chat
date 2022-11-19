@@ -1,7 +1,7 @@
 import { APIGatewayProxyWebsocketHandlerV2, APIGatewayProxyWebsocketEventV2, APIGatewayProxyResultV2 } from 'aws-lambda'
 import { ApiGatewayManagementApi, Connect, DynamoDB } from 'aws-sdk';
 import { AttributeMap } from 'aws-sdk/clients/dynamodb';
-import { MessageProps, SendMessageContainer } from '../../../../common/websocket-types/chat-message';
+import {MessageProps, RecieveMessageProps, SendMessageContainer} from '../../../../common/websocket-types/chat-message';
 import { ConnectionTableItem } from '../../datamodel/connection-table';
 import { MessagesTable } from '../../datamodel/messages-table';
 import { scanComplete } from '../../util/dynamodb';
@@ -34,10 +34,11 @@ export const handler: APIGatewayProxyWebsocketHandlerV2 = async (event: APIGatew
     });
 
     const documentClient = new DynamoDB.DocumentClient();
+    const sentAt = new Date().toISOString();
     await documentClient.put({
         TableName: messagesTable, Item: {
             id: randomUUID(),
-            sentAt: new Date().toISOString(),
+            sentAt: sentAt,
             from: messageProps.from,
             to: messageProps.to
         } as MessagesTable
@@ -54,7 +55,7 @@ export const handler: APIGatewayProxyWebsocketHandlerV2 = async (event: APIGatew
         await Promise.all(
             connectedClientIds.map(
                 connectionId => callbackAPI.postToConnection(
-                    { ConnectionId: connectionId, Data: JSON.stringify({ from: messageProps.from, to: messageProps.to, message: incomingMessage } as MessageProps) }
+                    { ConnectionId: connectionId, Data: JSON.stringify({ from: messageProps.from, to: messageProps.to, message: incomingMessage, sentAt } as RecieveMessageProps) }
                 ).promise())
         );
         console.log('Posted to connections');
@@ -81,7 +82,7 @@ export const handler: APIGatewayProxyWebsocketHandlerV2 = async (event: APIGatew
         console.log('Recipient connection Id: ' + recipientConnectionId);
         console.log('Posting to connection');
         await callbackAPI.postToConnection(
-            { ConnectionId: recipientConnectionId, Data: JSON.stringify({ from: messageProps.from, to: messageProps.to, message: incomingMessage } as MessageProps) }
+            { ConnectionId: recipientConnectionId, Data: JSON.stringify({ from: messageProps.from, to: messageProps.to, message: incomingMessage, sentAt } as RecieveMessageProps) }
         ).promise()
 
         console.log('Posted to connections');
