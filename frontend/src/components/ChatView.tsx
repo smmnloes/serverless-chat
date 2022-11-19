@@ -28,15 +28,23 @@ function ChatView() {
     useEffect(() => {
         const client: w3cwebsocket = new w3cwebsocket('wss://chat-ws-api.mloesch.it/?name=' + name)
 
-        client.onmessage = (message) => setMessages(prev => {
-            console.log("recieved message " + JSON.stringify(message.data))
-            if (typeof message.data === "string") {
-                return [...prev, JSON.parse(message.data) as RecieveMessageProps]
-            } else {
-                console.log("Unknown messge format")
-                return prev
+        client.onmessage = (message) => {
+            setMessages(prev => {
+                console.log("recieved message " + JSON.stringify(message.data))
+                if (typeof message.data === "string") {
+                    return [...prev, JSON.parse(message.data) as RecieveMessageProps]
+                } else {
+                    console.log("Unknown messge format")
+                    return prev
+                }
+            })
+            // scroll down in div
+            const messgeViewDiv = document.getElementById('MessageView');
+            if (messgeViewDiv){
+                messgeViewDiv.scrollTop = messgeViewDiv.scrollHeight
             }
-        })
+
+        }
 
         client.onerror = error => console.log(error)
         client.onclose = () => console.log('Connection closed')
@@ -84,7 +92,7 @@ function ChatView() {
     return (<div className="ChatView">
         <p>Name: {name || 'No name given'}</p>
         <p>Connection status: {connectionStatus}</p>
-        <div className="MessageView">
+        <div className="MessageView" id="MessageView">
             <ul>{messages.map(messageTransformer)}</ul>
         </div>
         <label htmlFor="messageInput">Your Message</label><input id="messageInput" type="text"
