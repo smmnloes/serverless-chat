@@ -1,6 +1,5 @@
-import { APIGatewayProxyEvent, APIGatewayProxyResultV2 } from 'aws-lambda';
-import { DynamoDB } from 'aws-sdk';
-import { scanComplete } from '../../util/dynamodb';
+import {APIGatewayProxyEvent, APIGatewayProxyResultV2} from 'aws-lambda';
+import {DynamoDB} from 'aws-sdk';
 
 const DEFAULT_MESSAGES_LIMIT = 50
 
