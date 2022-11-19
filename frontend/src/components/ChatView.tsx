@@ -4,6 +4,7 @@ import {Link} from 'react-router-dom';
 import './ChatView.css';
 import {w3cwebsocket} from "websocket";
 import {RecieveMessageProps} from "../../../common/websocket-types/chat-message";
+import {messageTransformer} from "../services/messageTransformer";
 
 enum ConnectionStatus {
     CONNECTED = 'connected', DISCONNECTED = 'disconnected', CONNECTING = 'connecting...'

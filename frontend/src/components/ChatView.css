@@ -22,3 +22,11 @@
     padding: 1rem;
 
 }
+
+.MessageView ul {
+    list-style: none;
+}
+
+.MessageView ul span {
+    font-size: small
+}
