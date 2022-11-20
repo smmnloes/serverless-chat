@@ -2,10 +2,9 @@ import React, {useEffect, useState} from 'react';
 import {useLocation} from 'react-router';
 import {Link} from 'react-router-dom';
 import './ChatView.css';
-import {IMessageEvent, w3cwebsocket} from "websocket";
-import {RecieveMessageProps} from "../../../common/websocket-types/chat-message";
+import {RecieveMessageProps, SendMessageContainer} from "../../../common/websocket-types/chat-message";
 import {messageTransformer} from "../services/messageTransformer";
-import {websocketService} from "../services/websocket-service";
+import useWebSocket, {ReadyState} from "react-use-websocket";
 
 export enum ConnectionStatus {
     CONNECTED = 'connected', DISCONNECTED = 'disconnected', CONNECTING = 'connecting...'
@@ -15,8 +14,6 @@ export enum ConnectionStatus {
 function ChatView() {
     const location = useLocation()
     const {name} = location.state
-    const [connectionStatus, setConnectionStatus] = useState(ConnectionStatus.DISCONNECTED)
-    const [websocketClient, setWebsocketClient] = useState<w3cwebsocket | null>(null)
     const [message, setMessage] = useState("")
     const [messages, setMessages] = useState<RecieveMessageProps[]>([])
 
@@ -25,45 +22,42 @@ function ChatView() {
     }
 
     const url = 'wss://chat-ws-api.mloesch.it'
-    // Init websocket connection
+
+    const {sendMessage, lastMessage, readyState} = useWebSocket(url, {
+        queryParams: {name},
+        onError: (error) => console.log(error),
+        shouldReconnect: () => true,
+        retryOnError: true,
+        reconnectAttempts: 5,
+        reconnectInterval: 3000
+    });
     useEffect(() => {
-
-        const onerror = (error: Error) => console.log(error)
-
-        const onmessage = (message: IMessageEvent) => {
-            setMessages(prev => {
-                console.log("recieved message " + JSON.stringify(message.data))
-                if (typeof message.data === "string") {
-                    return [...prev, JSON.parse(message.data) as RecieveMessageProps]
-                } else {
-                    console.log("Unknown messge format")
-                    return prev
-                }
-            })
-            // scroll down in div
-            const messgeViewDiv = document.getElementById('MessageView');
-            if (messgeViewDiv) {
-                messgeViewDiv.scrollTop = messgeViewDiv.scrollHeight
-            }
-
+        if (lastMessage !== null) {
+            setMessages((prev) => prev.concat(JSON.parse(lastMessage.data)));
         }
-        return websocketService(url, name, onmessage, onerror, setWebsocketClient, setConnectionStatus)
-
-    }, [])
+    }, [lastMessage, setMessages]);
 
 
-    function sendMessageClickHandler() {
-        console.log("sending message")
-        if (websocketClient) {
-            console.log("websocketclient initialized")
-            websocketClient.send(JSON.stringify({
-                action: 'message', messageProps: {message, from: name, to: 'all'}
-            }))
-        } else {
-            console.log("client not initialized")
+    const connectionStatus = {
+        [ReadyState.CONNECTING]: 'Connecting',
+        [ReadyState.OPEN]: 'Open',
+        [ReadyState.CLOSING]: 'Closing',
+        [ReadyState.CLOSED]: 'Closed',
+        [ReadyState.UNINSTANTIATED]: 'Uninstantiated',
+    }[readyState];
+
+    useEffect(() => {
+        // scroll down in div
+        const messgeViewDiv = document.getElementById('MessageView');
+        if (messgeViewDiv) {
+            messgeViewDiv.scrollTop = messgeViewDiv.scrollHeight
         }
+    }, [messages])
 
-    }
+
+    const sendMessageClickHandler = () => sendMessage(JSON.stringify({
+        action: 'message', messageProps: {message, from: name, to: 'all'}
+    } as SendMessageContainer));
 
     return (<div className="ChatView">
         <p>Name: {name || 'No name given'}</p>
