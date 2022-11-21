@@ -33,16 +33,19 @@ function ChatView() {
         reconnectAttempts: 5,
         reconnectInterval: 3000
     });
+    const sendMessageClickHandler = () => sendMessage(JSON.stringify({
+        action: 'message', messageProps: {message, from: name, to: 'all'}
+    } as SendMessageContainer));
+
+
     useEffect(() => {
         if (lastMessage !== null) {
             setMessages((prev) => prev.concat(JSON.parse(lastMessage.data)));
         }
     }, [lastMessage, setMessages]);
 
-
     const connectionStatus = {
-        [ReadyState.CONNECTING]: 'Connecting',
-        [ReadyState.OPEN]: 'Open',
+        [ReadyState.CONNECTING]: 'Connecting', [ReadyState.OPEN]: 'Open',
         [ReadyState.CLOSING]: 'Closing',
         [ReadyState.CLOSED]: 'Closed',
         [ReadyState.UNINSTANTIATED]: 'Uninstantiated',
@@ -65,10 +68,6 @@ function ChatView() {
             setMessages(latestMessages)
         })()
     }, [])
-
-    const sendMessageClickHandler = () => sendMessage(JSON.stringify({
-        action: 'message', messageProps: {message, from: name, to: 'all'}
-    } as SendMessageContainer));
 
     return (<div className="ChatView">
         <p>Name: {name || 'No name given'}</p>
