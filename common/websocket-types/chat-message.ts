@@ -1,4 +1,4 @@
-import { WSAction } from "./actions"
+import {WSAction} from "./actions"
 
 export interface SendMessageContainer {
     action: WSAction.MESSAGE
@@ -15,6 +15,5 @@ export type RecieveMessageProps = {
     message: string,
     from: string,
     to: string,
-    sentAt: string,
-    messageId: string
+    sentAt: string, id: string
 }

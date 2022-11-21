@@ -54,6 +54,13 @@ function ChatView() {
         }
     }, [messages])
 
+    useEffect(() => {
+        // load all messages on first load
+        const messgeViewDiv = document.getElementById('MessageView');
+        if (messgeViewDiv) {
+            messgeViewDiv.scrollTop = messgeViewDiv.scrollHeight
+        }
+    }, [])
 
     const sendMessageClickHandler = () => sendMessage(JSON.stringify({
         action: 'message', messageProps: {message, from: name, to: 'all'}

@@ -1,7 +1,7 @@
 import {APIGatewayProxyResultV2} from 'aws-lambda';
 import {DynamoDB} from 'aws-sdk';
-import {MessagesTable} from "../../datamodel/messages-table";
 import {sortByStringDesc} from "../../util/sort";
+import {RecieveMessageProps} from "../../../../common/websocket-types/chat-message";
 
 const MAX_MESSAGES_LIMIT = 30
 
@@ -11,9 +11,9 @@ export const handler = async (): Promise<APIGatewayProxyResultV2> => {
     })()
     console.log('Querying messages');
     const documentClient = new DynamoDB.DocumentClient();
-    const allMessages = (await documentClient.scan({TableName: messagesTable}).promise()).Items as MessagesTable[];
+    const allMessages = (await documentClient.scan({TableName: messagesTable}).promise()).Items as RecieveMessageProps[];
     allMessages.sort((messageA, messageB) => sortByStringDesc(messageA.sentAt, messageB.sentAt))
-    let messagesToReturn: MessagesTable[]
+    let messagesToReturn: RecieveMessageProps[]
     if (!allMessages) {
         messagesToReturn = []
     } else if (allMessages.length > MAX_MESSAGES_LIMIT) {
@@ -36,7 +36,7 @@ export const handler = async (): Promise<APIGatewayProxyResultV2> => {
  * @param documentClient
  * @param messagesTable table name of messages table
  */
-async function deleteSuperfluousMessages(messagesSorted: MessagesTable[], documentClient: DynamoDB.DocumentClient, messagesTable: string): Promise<void> {
+async function deleteSuperfluousMessages(messagesSorted: RecieveMessageProps[], documentClient: DynamoDB.DocumentClient, messagesTable: string): Promise<void> {
     const messagesToDelete = messagesSorted.slice(MAX_MESSAGES_LIMIT, messagesSorted.length)
     console.log('Deleting ' + messagesToDelete.length + ' items')
 

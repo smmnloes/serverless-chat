@@ -3,7 +3,6 @@ import {ApiGatewayManagementApi, DynamoDB} from 'aws-sdk';
 import {AttributeMap} from 'aws-sdk/clients/dynamodb';
 import {RecieveMessageProps, SendMessageContainer} from '../../../../common/websocket-types/chat-message';
 import {ConnectionTableItem} from '../../datamodel/connection-table';
-import {MessagesTable} from '../../datamodel/messages-table';
 import {scanComplete} from '../../util/dynamodb';
 import {randomUUID} from 'crypto'
 
@@ -38,11 +37,11 @@ export const handler: APIGatewayProxyWebsocketHandlerV2 = async (event: APIGatew
 
     const documentClient = new DynamoDB.DocumentClient();
     const sentAt = new Date().toISOString();
-    let messageId = randomUUID();
+    let id = randomUUID();
     await documentClient.put({
         TableName: messagesTable, Item: {
-            id: messageId, sentAt: sentAt, from: messageProps.from, to: messageProps.to
-        } as MessagesTable
+            id, sentAt, from: messageProps.from, to: messageProps.to
+        } as RecieveMessageProps
     }).promise()
 
     if (messageProps.to === 'all') {
@@ -58,7 +57,7 @@ export const handler: APIGatewayProxyWebsocketHandlerV2 = async (event: APIGatew
         console.log('Posting to connections');
         await Promise.all(connectedClientIds.map(connectionId => callbackAPI.postToConnection({
             ConnectionId: connectionId, Data: JSON.stringify({
-                from: messageProps.from, to: messageProps.to, message: incomingMessage, sentAt, messageId
+                from: messageProps.from, to: messageProps.to, message: incomingMessage, sentAt, id: id
             } as RecieveMessageProps)
         }).promise()));
         console.log('Posted to connections');
@@ -86,7 +85,7 @@ export const handler: APIGatewayProxyWebsocketHandlerV2 = async (event: APIGatew
         console.log('Posting to connection');
         await callbackAPI.postToConnection({
             ConnectionId: recipientConnectionId, Data: JSON.stringify({
-                from: messageProps.from, to: messageProps.to, message: incomingMessage, sentAt, messageId
+                from: messageProps.from, to: messageProps.to, message: incomingMessage, sentAt, id: id
             } as RecieveMessageProps)
         }).promise()
 
