@@ -32,6 +32,14 @@ function ChatView() {
 
     const url = 'wss://chat-ws-api.mloesch.it'
 
+    const sendMessageClickHandler = () => {
+        if (message) {
+            sendMessage(JSON.stringify({
+                action: 'message', messageProps: {message, from: name, to: 'all'}
+            } as SendMessageContainer))
+            setMessage('')
+        }
+    };
     const {sendMessage, lastMessage, readyState} = useWebSocket(url, {
         queryParams: {name},
         onError: (error) => console.log(error),
@@ -40,13 +48,6 @@ function ChatView() {
         reconnectAttempts: 5,
         reconnectInterval: 3000
     });
-    const sendMessageClickHandler = () => {
-        if (message) {
-            sendMessage(JSON.stringify({
-                action: 'message', messageProps: {message, from: name, to: 'all'}
-            } as SendMessageContainer))
-        }
-    };
 
 
     useEffect(() => {
