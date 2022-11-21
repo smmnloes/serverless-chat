@@ -23,6 +23,13 @@ function ChatView() {
         setMessage(e.currentTarget.value)
     }
 
+    function messageOnKeyUpHandler(e: React.KeyboardEvent<HTMLElement>) {
+        if (e.key === "Enter") {
+            sendMessageClickHandler()
+            setMessage('')
+        }
+    }
+
     const url = 'wss://chat-ws-api.mloesch.it'
 
     const {sendMessage, lastMessage, readyState} = useWebSocket(url, {
@@ -33,9 +40,13 @@ function ChatView() {
         reconnectAttempts: 5,
         reconnectInterval: 3000
     });
-    const sendMessageClickHandler = () => sendMessage(JSON.stringify({
-        action: 'message', messageProps: {message, from: name, to: 'all'}
-    } as SendMessageContainer));
+    const sendMessageClickHandler = () => {
+        if (message) {
+            sendMessage(JSON.stringify({
+                action: 'message', messageProps: {message, from: name, to: 'all'}
+            } as SendMessageContainer))
+        }
+    };
 
 
     useEffect(() => {
@@ -45,7 +56,8 @@ function ChatView() {
     }, [lastMessage, setMessages]);
 
     const connectionStatus = {
-        [ReadyState.CONNECTING]: 'Connecting', [ReadyState.OPEN]: 'Open',
+        [ReadyState.CONNECTING]: 'Connecting',
+        [ReadyState.OPEN]: 'Open',
         [ReadyState.CLOSING]: 'Closing',
         [ReadyState.CLOSED]: 'Closed',
         [ReadyState.UNINSTANTIATED]: 'Uninstantiated',
@@ -76,7 +88,9 @@ function ChatView() {
             <ul>{messages.map(messageTransformer)}</ul>
         </div>
         <label htmlFor="messageInput">Your Message</label><input id="messageInput" type="text"
-                                                                 onChange={messageChangeHandler}/>
+                                                                 onChange={messageChangeHandler}
+                                                                 onKeyUp={messageOnKeyUpHandler}
+                                                                 value={message}/>
         <button id="messageSend" onClick={sendMessageClickHandler}>Send</button>
         <Link to="/">
             <button>Go to Welcome View</button>
