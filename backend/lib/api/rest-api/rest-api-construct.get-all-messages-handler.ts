@@ -1,7 +1,7 @@
 import {APIGatewayProxyResultV2} from 'aws-lambda';
 import {DynamoDB} from 'aws-sdk';
 import {sortByStringDesc} from "../../util/sort";
-import {RecieveMessageProps} from "../../../../common/websocket-types/chat-message";
+import {StoredMessageProps} from "../../../../common/websocket-types/chat-message";
 
 const MAX_MESSAGES_LIMIT = 30
 
@@ -11,9 +11,9 @@ export const handler = async (): Promise<APIGatewayProxyResultV2> => {
     })()
     console.log('Querying messages');
     const documentClient = new DynamoDB.DocumentClient();
-    const allMessages = (await documentClient.scan({TableName: messagesTable}).promise()).Items as RecieveMessageProps[];
+    const allMessages = (await documentClient.scan({TableName: messagesTable}).promise()).Items as StoredMessageProps[];
     allMessages.sort((messageA, messageB) => sortByStringDesc(messageA.sentAt, messageB.sentAt))
-    let messagesToReturn: RecieveMessageProps[]
+    let messagesToReturn: StoredMessageProps[]
     if (!allMessages) {
         messagesToReturn = []
     } else if (allMessages.length > MAX_MESSAGES_LIMIT) {
@@ -26,7 +26,11 @@ export const handler = async (): Promise<APIGatewayProxyResultV2> => {
 
     console.log(`Retrieved latest messages`);
 
-    return {statusCode: 200, body: JSON.stringify({messages: messagesToReturn})};
+    return {
+        statusCode: 200,
+        body: JSON.stringify({messages: messagesToReturn}),
+        headers: {'Access-Control-Allow-Origin': '*'}
+    };
 
 }
 
@@ -36,7 +40,7 @@ export const handler = async (): Promise<APIGatewayProxyResultV2> => {
  * @param documentClient
  * @param messagesTable table name of messages table
  */
-async function deleteSuperfluousMessages(messagesSorted: RecieveMessageProps[], documentClient: DynamoDB.DocumentClient, messagesTable: string): Promise<void> {
+async function deleteSuperfluousMessages(messagesSorted: StoredMessageProps[], documentClient: DynamoDB.DocumentClient, messagesTable: string): Promise<void> {
     const messagesToDelete = messagesSorted.slice(MAX_MESSAGES_LIMIT, messagesSorted.length)
     console.log('Deleting ' + messagesToDelete.length + ' items')
 

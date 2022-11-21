@@ -1,4 +1,4 @@
-import {LambdaIntegration, RestApi} from "aws-cdk-lib/aws-apigateway";
+import {Cors, LambdaIntegration, RestApi} from "aws-cdk-lib/aws-apigateway";
 import {ICertificate} from "aws-cdk-lib/aws-certificatemanager";
 import {Table} from "aws-cdk-lib/aws-dynamodb";
 import {NodejsFunction} from "aws-cdk-lib/aws-lambda-nodejs";
@@ -14,15 +14,24 @@ export class RestApiConstruct extends Construct {
         super(scope, id)
 
         const recordName = 'chat-rest-api.mloesch.it';
-        const restApi = new RestApi(this, 'RestApi')
-        restApi.addDomainName('DomainName', {
-            certificate: props.certificate,
-            domainName: recordName
+        const restApi = new RestApi(this, 'RestApi', {
+            defaultCorsPreflightOptions: {
+                allowOrigins: Cors.ALL_ORIGINS, allowMethods: Cors.ALL_METHODS
+            }
         })
-        new ARecord(this, 'Arecord', { target: RecordTarget.fromAlias(new targets.ApiGateway(restApi)), zone: props.hostedZone, recordName })
+        restApi.addDomainName('DomainName', {
+            certificate: props.certificate, domainName: recordName
+        })
+        new ARecord(this, 'Arecord', {
+            target: RecordTarget.fromAlias(new targets.ApiGateway(restApi)), zone: props.hostedZone, recordName
+        })
 
-        const getAllConnectedUsersHandler = new NodejsFunction(this, 'get-connected-users-handler', { environment: { CONNECTION_TABLE_NAME: props.connectionTable.tableName }, logRetention: RetentionDays.ONE_MONTH  })
-        const getAllMessagesHandler = new NodejsFunction(this, 'get-all-messages-handler', { environment: { MESSAGES_TABLE_NAME: props.messagesTable.tableName }, logRetention: RetentionDays.ONE_MONTH })
+        const getAllConnectedUsersHandler = new NodejsFunction(this, 'get-connected-users-handler', {
+            environment: {CONNECTION_TABLE_NAME: props.connectionTable.tableName}, logRetention: RetentionDays.ONE_MONTH
+        })
+        const getAllMessagesHandler = new NodejsFunction(this, 'get-all-messages-handler', {
+            environment: {MESSAGES_TABLE_NAME: props.messagesTable.tableName}, logRetention: RetentionDays.ONE_MONTH
+        })
         props.connectionTable.grantReadData(getAllConnectedUsersHandler)
         props.messagesTable.grantReadWriteData(getAllMessagesHandler)
         restApi.root.addResource('user').addMethod('GET', new LambdaIntegration(getAllConnectedUsersHandler))

@@ -1,7 +1,7 @@
 import {APIGatewayProxyResultV2, APIGatewayProxyWebsocketEventV2, APIGatewayProxyWebsocketHandlerV2} from 'aws-lambda'
 import {ApiGatewayManagementApi, DynamoDB} from 'aws-sdk';
 import {AttributeMap} from 'aws-sdk/clients/dynamodb';
-import {RecieveMessageProps, SendMessageContainer} from '../../../../common/websocket-types/chat-message';
+import {SendMessageContainer, StoredMessageProps} from '../../../../common/websocket-types/chat-message';
 import {ConnectionTableItem} from '../../datamodel/connection-table';
 import {scanComplete} from '../../util/dynamodb';
 import {randomUUID} from 'crypto'
@@ -40,8 +40,8 @@ export const handler: APIGatewayProxyWebsocketHandlerV2 = async (event: APIGatew
     let id = randomUUID();
     await documentClient.put({
         TableName: messagesTable, Item: {
-            id, sentAt, from: messageProps.from, to: messageProps.to
-        } as RecieveMessageProps
+            id, sentAt, from: messageProps.from, to: messageProps.to, message: incomingMessage
+        } as StoredMessageProps
     }).promise()
 
     if (messageProps.to === 'all') {
@@ -58,7 +58,7 @@ export const handler: APIGatewayProxyWebsocketHandlerV2 = async (event: APIGatew
         await Promise.all(connectedClientIds.map(connectionId => callbackAPI.postToConnection({
             ConnectionId: connectionId, Data: JSON.stringify({
                 from: messageProps.from, to: messageProps.to, message: incomingMessage, sentAt, id: id
-            } as RecieveMessageProps)
+            } as StoredMessageProps)
         }).promise()));
         console.log('Posted to connections');
         return {statusCode: 200};
@@ -86,7 +86,7 @@ export const handler: APIGatewayProxyWebsocketHandlerV2 = async (event: APIGatew
         await callbackAPI.postToConnection({
             ConnectionId: recipientConnectionId, Data: JSON.stringify({
                 from: messageProps.from, to: messageProps.to, message: incomingMessage, sentAt, id: id
-            } as RecieveMessageProps)
+            } as StoredMessageProps)
         }).promise()
 
         console.log('Posted to connections');

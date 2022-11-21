@@ -2,18 +2,13 @@ import {WSAction} from "./actions"
 
 export interface SendMessageContainer {
     action: WSAction.MESSAGE
-    messageProps: MessageProps
+    messageProps: SendMessageProps
 }
 
-export type MessageProps = {
-    message: string,
-    from: string,
-    to: 'all' | string
+export type SendMessageProps = {
+    message: string, from: string, to: 'all' | string
 }
 
-export type RecieveMessageProps = {
-    message: string,
-    from: string,
-    to: string,
-    sentAt: string, id: string
+export type StoredMessageProps = {
+    message: string, from: string, to: string, sentAt: string, id: string
 }

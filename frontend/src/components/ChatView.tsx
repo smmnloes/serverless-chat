@@ -2,9 +2,11 @@ import React, {useEffect, useState} from 'react';
 import {useLocation} from 'react-router';
 import {Link} from 'react-router-dom';
 import './ChatView.css';
-import {RecieveMessageProps, SendMessageContainer} from "../../../common/websocket-types/chat-message";
+import {SendMessageContainer, StoredMessageProps} from "../../../common/websocket-types/chat-message";
 import {messageTransformer} from "../services/messageTransformer";
 import useWebSocket, {ReadyState} from "react-use-websocket";
+import {RestApi} from "../services/rest-api";
+import {sortByStringAsc} from "../util/sort";
 
 export enum ConnectionStatus {
     CONNECTED = 'connected', DISCONNECTED = 'disconnected', CONNECTING = 'connecting...'
@@ -15,7 +17,7 @@ function ChatView() {
     const location = useLocation()
     const {name} = location.state
     const [message, setMessage] = useState("")
-    const [messages, setMessages] = useState<RecieveMessageProps[]>([])
+    const [messages, setMessages] = useState<StoredMessageProps[]>([])
 
     function messageChangeHandler(e: React.FormEvent<HTMLInputElement>) {
         setMessage(e.currentTarget.value)
@@ -56,10 +58,12 @@ function ChatView() {
 
     useEffect(() => {
         // load all messages on first load
-        const messgeViewDiv = document.getElementById('MessageView');
-        if (messgeViewDiv) {
-            messgeViewDiv.scrollTop = messgeViewDiv.scrollHeight
-        }
+        (async () => {
+            console.log('Fetching latest messages')
+            const latestMessages = (await RestApi.getAllMessages())
+                .sort((messageA, messageB) => sortByStringAsc(messageA.sentAt, messageB.sentAt))
+            setMessages(latestMessages)
+        })()
     }, [])
 
     const sendMessageClickHandler = () => sendMessage(JSON.stringify({
