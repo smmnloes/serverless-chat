@@ -13,15 +13,15 @@ export const handler = async (): Promise<APIGatewayProxyResultV2> => {
     const documentClient = new DynamoDB.DocumentClient();
     const allMessages = (await documentClient.scan({TableName: messagesTable}).promise()).Items as MessagesTable[];
     allMessages.sort((messageA, messageB) => sortByStringDesc(messageA.sentAt, messageB.sentAt))
-    let messagesToReturn
+    let messagesToReturn: MessagesTable[]
     if (!allMessages) {
         messagesToReturn = []
+    } else if (allMessages.length > MAX_MESSAGES_LIMIT) {
+        console.log('To many messages in table, deleting superfluous ones')
+        await deleteSuperfluousMessages(allMessages, documentClient, messagesTable)
+        messagesToReturn = allMessages.slice(0, MAX_MESSAGES_LIMIT)
     } else {
-        if (allMessages.length > MAX_MESSAGES_LIMIT) {
-            console.log('To many messages in table, deleting superfluous ones')
-            await deleteSuperfluousMessages(allMessages, documentClient, messagesTable)
-            messagesToReturn = allMessages.slice(0, MAX_MESSAGES_LIMIT)
-        }
+        messagesToReturn = allMessages
     }
 
     console.log(`Retrieved latest messages`);
