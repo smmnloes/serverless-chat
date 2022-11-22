@@ -8,10 +8,6 @@ import useWebSocket, {ReadyState} from "react-use-websocket";
 import {RestApi} from "../services/rest-api";
 import {sortByStringAsc} from "../util/sort";
 
-export enum ConnectionStatus {
-    CONNECTED = 'connected', DISCONNECTED = 'disconnected', CONNECTING = 'connecting...'
-}
-
 
 function ChatView() {
     const location = useLocation()
