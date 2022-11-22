@@ -29,7 +29,7 @@ function ChatView() {
     const url = 'wss://chat-ws-api.mloesch.it'
 
     const sendMessageClickHandler = () => {
-        if (message) {
+        if (message && name) {
             sendMessage(JSON.stringify({
                 action: 'message', messageProps: {message, from: name, to: 'all'}
             } as SendMessageContainer))
