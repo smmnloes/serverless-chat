@@ -7,6 +7,7 @@ import {messageTransformer} from "../services/messageTransformer";
 import useWebSocket, {ReadyState} from "react-use-websocket";
 import {RestApi} from "../services/rest-api";
 import {sortByStringAsc} from "../util/sort";
+import {baseUrlWebsocket} from "../config/urls";
 
 
 function ChatView() {
@@ -26,8 +27,6 @@ function ChatView() {
         }
     }
 
-    const url = 'wss://chat-ws-api.mloesch.it'
-
     const sendMessageClickHandler = () => {
         if (message && name) {
             sendMessage(JSON.stringify({
@@ -36,7 +35,7 @@ function ChatView() {
             setMessage('')
         }
     };
-    const {sendMessage, lastMessage, readyState} = useWebSocket(url, {
+    const {sendMessage, lastMessage, readyState} = useWebSocket(baseUrlWebsocket, {
         queryParams: {name},
         onError: (error) => console.log(error),
         shouldReconnect: () => true,
