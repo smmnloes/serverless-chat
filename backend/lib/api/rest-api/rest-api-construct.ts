@@ -9,21 +9,23 @@ import {Construct} from "constructs";
 
 export class RestApiConstruct extends Construct {
     constructor(scope: Construct, id: string, props: {
-        certificate: ICertificate, hostedZone: IHostedZone, connectionTable: Table, messagesTable: Table
+        certificate: ICertificate, hostedZone: IHostedZone, siteDomain: string, connectionTable: Table, messagesTable: Table
     }) {
         super(scope, id)
 
-        const recordName = 'chat-rest-api.mloesch.it';
+        const chatRestApiDomainName = `chat-rest-api.${props.siteDomain}`;
         const restApi = new RestApi(this, 'RestApi', {
             defaultCorsPreflightOptions: {
                 allowOrigins: Cors.ALL_ORIGINS, allowMethods: Cors.ALL_METHODS
             }
         })
         restApi.addDomainName('DomainName', {
-            certificate: props.certificate, domainName: recordName
+            certificate: props.certificate, domainName: chatRestApiDomainName
         })
         new ARecord(this, 'Arecord', {
-            target: RecordTarget.fromAlias(new targets.ApiGateway(restApi)), zone: props.hostedZone, recordName
+            target: RecordTarget.fromAlias(new targets.ApiGateway(restApi)),
+            zone: props.hostedZone,
+            recordName: chatRestApiDomainName
         })
 
         const getAllConnectedUsersHandler = new NodejsFunction(this, 'get-connected-users-handler', {
