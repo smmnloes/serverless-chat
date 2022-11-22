@@ -3,12 +3,11 @@ import {ARecord, IHostedZone, RecordTarget} from "aws-cdk-lib/aws-route53";
 import {Bucket} from "aws-cdk-lib/aws-s3";
 import {RemovalPolicy} from "aws-cdk-lib";
 import {ICertificate} from "aws-cdk-lib/aws-certificatemanager";
-import {
-    CloudFrontWebDistribution, OriginAccessIdentity, PriceClass, ViewerCertificate, ViewerProtocolPolicy
-} from "aws-cdk-lib/aws-cloudfront";
+import {Distribution, OriginAccessIdentity, PriceClass, ViewerProtocolPolicy} from "aws-cdk-lib/aws-cloudfront";
 import {CloudFrontTarget} from "aws-cdk-lib/aws-route53-targets";
 import {BucketDeployment, Source} from "aws-cdk-lib/aws-s3-deployment";
 import path from 'path'
+import {S3Origin} from "aws-cdk-lib/aws-cloudfront-origins";
 
 export type DistributionProps = {
     zone: IHostedZone, certificate: ICertificate, siteDomain: string
@@ -21,29 +20,26 @@ export class DistributionConstruct extends Construct {
         // Content bucket
         let chatDomain = `chat.${props.siteDomain}`;
         const siteBucket = new Bucket(this, "SiteBucket", {
-            bucketName: chatDomain, websiteIndexDocument: "index.html", //websiteErrorDocument: "error.html",
-            publicReadAccess: false, removalPolicy: RemovalPolicy.DESTROY, autoDeleteObjects: true
+            bucketName: chatDomain,
+            websiteIndexDocument: "index.html",
+            publicReadAccess: true,
+            removalPolicy: RemovalPolicy.DESTROY,
+            autoDeleteObjects: true
         });
 
 
         const originAccessIdentity = new OriginAccessIdentity(this, 'SitebucketAccessIdentity')
         siteBucket.grantRead(originAccessIdentity)
-        const distribution = new CloudFrontWebDistribution(this, 'SiteDistribution', {
+        const distribution = new Distribution(this, 'SiteDistribution', {
             comment: 'Distribution for serverless chat app',
             enabled: true,
             priceClass: PriceClass.PRICE_CLASS_100,
-            viewerProtocolPolicy: ViewerProtocolPolicy.REDIRECT_TO_HTTPS,
-            viewerCertificate: ViewerCertificate.fromAcmCertificate(props.certificate, {}),
-            originConfigs: [{
-                s3OriginSource: {
-                    s3BucketSource: siteBucket, originAccessIdentity
-                }, behaviors: [{isDefaultBehavior: true}],
-            },],
-        })
-        new BucketDeployment(this, 'SiteDeployment', {
-            sources: [Source.asset(path.resolve(__dirname, '..', '..', '..', 'frontend', 'build'))],
-            destinationBucket: siteBucket,
-            distribution
+            certificate: props.certificate,
+            defaultBehavior: {
+                origin: new S3Origin(siteBucket, {originAccessIdentity}),
+                viewerProtocolPolicy: ViewerProtocolPolicy.REDIRECT_TO_HTTPS
+            },
+            domainNames: [chatDomain]
         })
 
         new ARecord(this, "SiteAliasRecord", {
@@ -51,6 +47,12 @@ export class DistributionConstruct extends Construct {
             target: RecordTarget.fromAlias(new CloudFrontTarget(distribution)),
             zone: props.zone,
         });
+
+        new BucketDeployment(this, 'SiteDeployment', {
+            sources: [Source.asset(path.resolve(__dirname, '..', '..', '..', 'frontend', 'build'))],
+            destinationBucket: siteBucket,
+            distribution
+        })
     }
 
 }
