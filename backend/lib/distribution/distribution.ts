@@ -3,7 +3,7 @@ import {ARecord, IHostedZone, RecordTarget} from "aws-cdk-lib/aws-route53";
 import {Bucket} from "aws-cdk-lib/aws-s3";
 import {RemovalPolicy} from "aws-cdk-lib";
 import {ICertificate} from "aws-cdk-lib/aws-certificatemanager";
-import {Distribution, PriceClass, ViewerProtocolPolicy} from "aws-cdk-lib/aws-cloudfront";
+import {Distribution, OriginAccessIdentity, PriceClass, ViewerProtocolPolicy} from "aws-cdk-lib/aws-cloudfront";
 import {CloudFrontTarget} from "aws-cdk-lib/aws-route53-targets";
 import {BucketDeployment, Source} from "aws-cdk-lib/aws-s3-deployment";
 import path from 'path'
@@ -27,13 +27,17 @@ export class DistributionConstruct extends Construct {
             autoDeleteObjects: true
         });
 
+
+        const originAccessIdentity = new OriginAccessIdentity(this, 'SitebucketAccessIdentity')
+        siteBucket.grantRead(originAccessIdentity)
         const distribution = new Distribution(this, 'SiteDistribution', {
             comment: 'Distribution for serverless chat app',
             enabled: true,
             priceClass: PriceClass.PRICE_CLASS_100,
             certificate: props.certificate,
             defaultBehavior: {
-                origin: new S3Origin(siteBucket), viewerProtocolPolicy: ViewerProtocolPolicy.REDIRECT_TO_HTTPS
+                origin: new S3Origin(siteBucket, {originAccessIdentity}),
+                viewerProtocolPolicy: ViewerProtocolPolicy.REDIRECT_TO_HTTPS
             },
             domainNames: [chatDomain]
         })
