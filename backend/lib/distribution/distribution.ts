@@ -1,6 +1,6 @@
 import {Construct} from "constructs";
 import {ARecord, IHostedZone, RecordTarget} from "aws-cdk-lib/aws-route53";
-import {Bucket} from "aws-cdk-lib/aws-s3";
+import {BlockPublicAccess, Bucket} from "aws-cdk-lib/aws-s3";
 import {RemovalPolicy} from "aws-cdk-lib";
 import {ICertificate} from "aws-cdk-lib/aws-certificatemanager";
 import {Distribution, OriginAccessIdentity, PriceClass, ViewerProtocolPolicy} from "aws-cdk-lib/aws-cloudfront";
@@ -9,20 +9,20 @@ import {BucketDeployment, Source} from "aws-cdk-lib/aws-s3-deployment";
 import path from 'path'
 import {S3Origin} from "aws-cdk-lib/aws-cloudfront-origins";
 
-export type DistributionProps = {
+export type DistributionConstructProps = {
     zone: IHostedZone, certificate: ICertificate, siteDomain: string
 }
 
 export class DistributionConstruct extends Construct {
 
-    constructor(scope: Construct, id: string, props: DistributionProps) {
+    constructor(scope: Construct, id: string, props: DistributionConstructProps) {
         super(scope, id)
         // Content bucket
         let chatDomain = `chat.${props.siteDomain}`;
         const siteBucket = new Bucket(this, "SiteBucket", {
             bucketName: chatDomain,
-            websiteIndexDocument: "index.html",
-            publicReadAccess: true,
+            publicReadAccess: false,
+            blockPublicAccess: BlockPublicAccess.BLOCK_ALL,
             removalPolicy: RemovalPolicy.DESTROY,
             autoDeleteObjects: true
         });
@@ -34,7 +34,9 @@ export class DistributionConstruct extends Construct {
             comment: 'Distribution for serverless chat app',
             enabled: true,
             priceClass: PriceClass.PRICE_CLASS_100,
+            defaultRootObject: 'index.html',
             certificate: props.certificate,
+            errorResponses: [{responseHttpStatus: 200, httpStatus: 403, responsePagePath: '/index.html'}],
             defaultBehavior: {
                 origin: new S3Origin(siteBucket, {originAccessIdentity}),
                 viewerProtocolPolicy: ViewerProtocolPolicy.REDIRECT_TO_HTTPS
