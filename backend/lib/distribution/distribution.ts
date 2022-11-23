@@ -36,7 +36,11 @@ export class DistributionConstruct extends Construct {
             priceClass: PriceClass.PRICE_CLASS_100,
             defaultRootObject: 'index.html',
             certificate: props.certificate,
-            errorResponses: [{responseHttpStatus: 200, httpStatus: 403, responsePagePath: '/index.html'}],
+            errorResponses: [{
+                responseHttpStatus: 200, httpStatus: 403, responsePagePath: '/index.html'
+            }, {
+                responseHttpStatus: 200, httpStatus: 404, responsePagePath: '/index.html'
+            }],
             defaultBehavior: {
                 origin: new S3Origin(siteBucket, {originAccessIdentity}),
                 viewerProtocolPolicy: ViewerProtocolPolicy.REDIRECT_TO_HTTPS
