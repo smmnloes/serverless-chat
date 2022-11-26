@@ -31,7 +31,7 @@ function WelcomeView() {
     return (<div className='WelcomeView'>
         <h1>Welcome to Serverless Chat!</h1>
         <div className="inputContainer">
-            <label htmlFor="nameInput">Please enter your name</label>
+            <label htmlFor="nameInput">What is your name?</label>
             <input id="nameInput" type="string" onChange={handleInput} onKeyUp={handleKeyUp} value={name}></input>
             <button onClick={onClickHandler}>Connect</button>
         </div>

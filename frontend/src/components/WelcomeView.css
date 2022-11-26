@@ -15,7 +15,7 @@
     margin-left: 0.5rem;
 }
 
-.inputContainer {
-    width: 30%;
-    margin: auto;
+#nameInput {
+    margin-top: 0.5rem;
+    margin-bottom: 0.5rem;
 }
