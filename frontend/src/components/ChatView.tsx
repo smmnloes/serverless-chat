@@ -1,18 +1,18 @@
-import React, {useEffect, useState} from 'react';
-import {useLocation} from 'react-router';
-import {Link} from 'react-router-dom';
+import React, { useEffect, useState } from 'react';
+import { useLocation } from 'react-router';
+import { Link } from 'react-router-dom';
 import './ChatView.css';
-import {SendMessageContainer, StoredMessageProps} from "../../../common/websocket-types/chat-message";
-import {messageTransformer} from "../services/messageTransformer";
-import useWebSocket, {ReadyState} from "react-use-websocket";
-import {RestApi} from "../services/rest-api";
-import {sortByStringAsc} from "../util/sort";
-import {baseUrlWebsocket} from "../config/urls";
+import { SendMessageContainer, StoredMessageProps } from "../../../common/websocket-types/chat-message";
+import { messageTransformer } from "../services/messageTransformer";
+import useWebSocket, { ReadyState } from "react-use-websocket";
+import { RestApi } from "../services/rest-api";
+import { sortByStringAsc } from "../util/sort";
+import { baseUrlWebsocket } from "../config/urls";
 
 
 function ChatView() {
     const location = useLocation()
-    const {name} = location.state
+    const { name } = location.state
     const [message, setMessage] = useState("")
     const [messages, setMessages] = useState<StoredMessageProps[]>([])
 
@@ -30,14 +30,14 @@ function ChatView() {
     const sendMessageClickHandler = () => {
         if (message && name) {
             sendMessage(JSON.stringify({
-                action: 'message', messageProps: {message, from: name, to: 'all'}
+                action: 'message', messageProps: { message, from: name, to: 'all' }
             } as SendMessageContainer))
             setMessage('')
         }
     };
-    const {sendMessage, lastMessage, readyState} = useWebSocket(baseUrlWebsocket, {
-        queryParams: {name},
-        onError: (error) => console.log(error),
+    const { sendMessage, lastMessage, readyState } = useWebSocket(baseUrlWebsocket, {
+        queryParams: { name },
+        onError: (error: any) => console.log(error),
         shouldReconnect: () => true,
         retryOnError: true,
         reconnectAttempts: 5,
@@ -78,19 +78,22 @@ function ChatView() {
     }, [])
 
     return (<div className="ChatView">
-        <p>Name: {name || 'No name given'}</p>
-        <p>Connection status: {connectionStatus}</p>
-        <div className="MessageView" id="MessageView">
-            <ul>{messages.map(messageTransformer)}</ul>
+        <div className='TopControls'>
+            <p>Name: <b>{name || 'No name given'}</b></p>
+            <p>Connection: <b>{connectionStatus}</b></p>
         </div>
-        <label htmlFor="messageInput">Your Message</label><input id="messageInput" type="text"
-                                                                 onChange={messageChangeHandler}
-                                                                 onKeyUp={messageOnKeyUpHandler}
-                                                                 value={message}/>
-        <button id="messageSend" onClick={sendMessageClickHandler}>Send</button>
-        <Link to="/">
-            <button>Go to Welcome View</button>
-        </Link>
+        <div className='MessageAndControls'>
+            <div className="MessageView" id="MessageView">
+                <ul>{messages.map(messageTransformer)}</ul>
+            </div>
+            <div className='BottomControls'>
+                <input id="messageInput" type="text"
+                    onChange={messageChangeHandler}
+                    onKeyUp={messageOnKeyUpHandler}
+                    value={message} />
+                <button id="messageSend" onClick={sendMessageClickHandler}>Send</button>
+            </div>
+        </div>
     </div>);
 }
 

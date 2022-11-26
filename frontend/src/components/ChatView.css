@@ -2,31 +2,81 @@
     border-style: solid;
     border-radius: 0.5rem;
     margin: 5rem 5rem 5rem 5rem;
-    text-align: center;
     padding: 1rem;
 }
-
-
-.ChatView button {
-    width: 5rem;
-    margin-left: 0.5rem;
+.TopControls {
+    text-align: center;
 }
 
+
+.BottomControls{
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    margin-top: 1rem
+}
+
+#messageInput { 
+    margin-right: 1em;
+    flex-grow: 1;
+    
+}
+
+
+
+
+.MessageAndControls {
+    margin: 1rem;
+}
 .MessageView {
-    width: 80%;
     height: 10rem;
     overflow-y: auto;
     border: 5px solid green;
-    margin: 2rem auto 2rem auto;
+    margin: auto;
+   
     text-align: left;
     padding: 1rem;
 
 }
 
+
 .MessageView ul {
     list-style: none;
+    padding: 0
+    ;
 }
 
 .MessageView ul span {
     font-size: small
 }
+
+@media screen and (max-width: 30em) {
+    .ChatView {
+        margin: 1rem
+    }
+    .BottomControls {
+        flex-direction: column;
+    }
+    #messageInput {
+        align-self:stretch;
+        margin-right: 0;
+    }
+
+    #messageSend {
+        margin-top: 1em;
+        align-self: center;
+    }
+
+    .MessageView {
+        padding: 0.3rem
+    }
+  }
+
+  @media screen and (min-width: 1200px) {
+    .ChatView {
+        margin-left: 20rem;
+        margin-right: 20rem;
+    
+    }
+
+  }
