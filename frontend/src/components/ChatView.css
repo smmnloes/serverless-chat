@@ -1,8 +1,9 @@
 .ChatView {
     border-style: solid;
     border-radius: 0.5rem;
-    margin: 5rem 5rem 5rem 5rem;
+    margin: 5rem auto 5rem auto;
     padding: 1rem;
+    max-width: 40rem;
 }
 
 .TopControls {
@@ -31,7 +32,7 @@
 }
 
 .MessageView {
-    height: 10rem;
+    height: 30rem;
     overflow-y: auto;
     border: 1px solid;
     border-radius: 0.5rem;
@@ -52,7 +53,7 @@
     font-size: small
 }
 
-@media screen and (max-width: 30em) {
+@media screen and (max-width: 50em) {
     .ChatView {
         margin: 1rem
     }
@@ -72,7 +73,7 @@
     }
 
     .MessageView {
-        padding: 0.3rem
+        padding: 0.3rem;
     }
 
     .MessageView ul span {
@@ -80,11 +81,3 @@
     }
 }
 
-@media screen and (min-width: 1200px) {
-    .ChatView {
-        margin-left: 20rem;
-        margin-right: 20rem;
-
-    }
-
-}
