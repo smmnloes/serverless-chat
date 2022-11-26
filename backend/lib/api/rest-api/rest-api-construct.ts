@@ -34,9 +34,16 @@ export class RestApiConstruct extends Construct {
         const getAllMessagesHandler = new NodejsFunction(this, 'get-all-messages-handler', {
             environment: {MESSAGES_TABLE_NAME: props.messagesTable.tableName}, logRetention: RetentionDays.ONE_MONTH
         })
+        const getUsernameAvailableHandler = new NodejsFunction(this, 'get-username-available-handler', {
+            environment: {CONNECTION_TABLE_NAME: props.connectionTable.tableName}, logRetention: RetentionDays.ONE_MONTH
+        })
         props.connectionTable.grantReadData(getAllConnectedUsersHandler)
+        props.connectionTable.grantReadData(getUsernameAvailableHandler)
         props.messagesTable.grantReadWriteData(getAllMessagesHandler)
-        restApi.root.addResource('user').addMethod('GET', new LambdaIntegration(getAllConnectedUsersHandler))
+        const userResource = restApi.root.addResource('user');
+        userResource.addMethod('GET', new LambdaIntegration(getAllConnectedUsersHandler))
+        userResource.addResource('{username}').addMethod('GET', new LambdaIntegration(getUsernameAvailableHandler))
+
         restApi.root.addResource('message').addMethod('GET', new LambdaIntegration(getAllMessagesHandler))
     }
 }
