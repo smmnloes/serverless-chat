@@ -18,4 +18,11 @@
 #nameInput {
     margin-top: 0.5rem;
     margin-bottom: 0.5rem;
+    font-size: 16px;
+}
+
+@media screen and (max-width: 30em) {
+    .WelcomeView {
+        margin: 1rem
+    }
 }

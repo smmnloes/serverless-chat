@@ -4,22 +4,23 @@
     margin: 5rem 5rem 5rem 5rem;
     padding: 1rem;
 }
+
 .TopControls {
     text-align: center;
 }
 
 
-.BottomControls{
+.BottomControls {
     display: flex;
     flex-direction: row;
     justify-content: space-between;
     margin-top: 1rem
 }
 
-#messageInput { 
+#messageInput {
     margin-right: 1em;
     flex-grow: 1;
-    
+
 }
 
 
@@ -28,13 +29,14 @@
 .MessageAndControls {
     margin: 1rem;
 }
+
 .MessageView {
     height: 10rem;
     overflow-y: auto;
     border: 1px solid;
     border-radius: 0.5rem;
     margin: auto;
-   
+
     text-align: left;
     padding: 1rem;
 
@@ -43,8 +45,7 @@
 
 .MessageView ul {
     list-style: none;
-    padding: 0
-    ;
+    padding: 0;
 }
 
 .MessageView ul span {
@@ -55,11 +56,13 @@
     .ChatView {
         margin: 1rem
     }
+
     .BottomControls {
         flex-direction: column;
     }
+
     #messageInput {
-        align-self:stretch;
+        align-self: stretch;
         margin-right: 0;
     }
 
@@ -71,16 +74,17 @@
     .MessageView {
         padding: 0.3rem
     }
+
     .MessageView ul span {
         font-size: smaller
     }
-  }
+}
 
-  @media screen and (min-width: 1200px) {
+@media screen and (min-width: 1200px) {
     .ChatView {
         margin-left: 20rem;
         margin-right: 20rem;
-    
+
     }
 
-  }
+}
