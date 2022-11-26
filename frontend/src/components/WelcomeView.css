@@ -21,6 +21,14 @@
     font-size: 16px;
 }
 
+.ErrorMessage {
+    color: red;
+    height: 2rem;
+ 
+    font-size: smaller;
+}
+
+
 @media screen and (max-width: 30em) {
     .WelcomeView {
         margin: 1rem
