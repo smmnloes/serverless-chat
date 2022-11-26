@@ -8,7 +8,7 @@ import useWebSocket, { ReadyState } from "react-use-websocket";
 import { RestApi } from "../services/rest-api";
 import { sortByStringAsc } from "../util/sort";
 import { baseUrlWebsocket } from "../config/urls";
-
+import { connectionStatusColors, connectionStatusText } from '../config/connectionStatus';
 
 function ChatView() {
     const location = useLocation()
@@ -51,13 +51,11 @@ function ChatView() {
         }
     }, [lastMessage, setMessages]);
 
-    const connectionStatus = {
-        [ReadyState.CONNECTING]: 'Connecting',
-        [ReadyState.OPEN]: 'Open',
-        [ReadyState.CLOSING]: 'Closing',
-        [ReadyState.CLOSED]: 'Closed',
-        [ReadyState.UNINSTANTIATED]: 'Uninstantiated',
-    }[readyState];
+    const connectionStatus = connectionStatusText[readyState];
+    const connectionStatusStyle = {
+        color: connectionStatusColors[readyState]
+    }
+
 
     useEffect(() => {
         // scroll down in div
@@ -80,7 +78,7 @@ function ChatView() {
     return (<div className="ChatView">
         <div className='TopControls'>
             <p>Name: <b>{name || 'No name given'}</b></p>
-            <p>Connection: <b>{connectionStatus}</b></p>
+            <p>Status: <b style={connectionStatusStyle}>{connectionStatus}</b></p>
         </div>
         <div className='MessageAndControls'>
             <div className="MessageView" id="MessageView">

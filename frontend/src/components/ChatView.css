@@ -31,7 +31,8 @@
 .MessageView {
     height: 10rem;
     overflow-y: auto;
-    border: 5px solid green;
+    border: 5px solid;
+    border-radius: 0.5rem;
     margin: auto;
    
     text-align: left;
