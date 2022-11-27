@@ -3,8 +3,10 @@ import { v4 as uuid } from 'uuid';
 import { RestApi } from '../services/rest-api';
 import './UserList.css';
 import { ReadyState } from 'react-use-websocket'
+import { RecieveMessage } from '../../../common/websocket-types/chat-message';
+import { UserConnectionMessage } from '../../../common/websocket-types/user-connection-message';
 
-function UserList(props: { readyState: ReadyState }) {
+function UserList(props: { readyState: ReadyState, lastMessage: RecieveMessage | UserConnectionMessage }) {
 
     const [connectedUsers, setConnectedUsers] = useState<string[]>([])
 
@@ -14,8 +16,23 @@ function UserList(props: { readyState: ReadyState }) {
         }
     }, [props.readyState])
 
+    useEffect(() => {
+        console.log('Updating user list')
+        const lastMessage = props.lastMessage;
+        console.log(lastMessage)
+        if (lastMessage && (lastMessage.messageType === 'USER_CONNECTED' || lastMessage.messageType === 'USER_DISCONNECTED')) {
+            const userConnectedMessage = props.lastMessage as UserConnectionMessage
+            if (props.lastMessage.messageType = 'USER_DISCONNECTED') {
+                setConnectedUsers(prev => prev.filter(username => username !== userConnectedMessage.username))
+            }
+            if (props.lastMessage.messageType = 'USER_CONNECTED') {
+                setConnectedUsers(prev => [...prev, userConnectedMessage.username])
+            }
+        }
+    }, [props.lastMessage])
+
     return (<div className="UserList">
-        <p><b>Users</b></p>
+        <p className="UserHeading"><b>Users</b></p>
         <ul>
             {connectedUsers.map(name => <li key={uuid()}>{name}</li>)}
         </ul>

@@ -87,7 +87,7 @@ function ChatView() {
                 <div className="MessageView" id="MessageView">
                     <ul>{messages.map(messageTransformer)}</ul>
                 </div>
-                <UserList readyState={readyState}></UserList>
+                <UserList readyState={readyState} lastMessage={JSON.parse(lastMessage?.data || null)}></UserList>
             </div>
             <div className='BottomControls'>
                 <input id="messageInput" type="text"
