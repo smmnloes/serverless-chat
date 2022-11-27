@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useLocation } from 'react-router';
 import useWebSocket from "react-use-websocket";
-import { RecieveMessageProps, SendMessageContainer, StoredMessageProps } from "../../../common/websocket-types/chat-message";
+import { RecieveMessage, SendMessageContainer, StoredMessageProps } from "../../../common/websocket-types/chat-message";
 import { UserConnectionMessage } from "../../../common/websocket-types/user-connection-message";
 import { connectionStatusColors, connectionStatusText } from '../config/connectionStatus';
 import { baseUrlWebsocket } from "../config/urls";
@@ -14,7 +14,7 @@ function ChatView() {
     const location = useLocation()
     const { name } = location.state
     const [message, setMessage] = useState("")
-    const [messages, setMessages] = useState<StoredMessageProps[]>([])
+    const [messages, setMessages] = useState<(RecieveMessage | UserConnectionMessage)[]>([])
 
     function messageChangeHandler(e: React.FormEvent<HTMLInputElement>) {
         setMessage(e.currentTarget.value)
@@ -49,15 +49,7 @@ function ChatView() {
         if (lastMessage !== null) {
             const lastMessageData = JSON.parse(lastMessage.data)
             console.log(JSON.stringify(lastMessageData))
-            if (lastMessageData.messageType === 'USER_CONNECTED') {
-                console.log("User connected: " + (lastMessageData as UserConnectionMessage).username)
-            }
-            if (lastMessageData.messageType === 'USER_DISCONNECTED') {
-                console.log("User disconnected: " + (lastMessageData as UserConnectionMessage).username)
-            }
-            if (lastMessageData.messageType === 'MESSAGE') {
-                setMessages((prev) => prev.concat((lastMessageData as RecieveMessageProps).messageProps));
-            }
+            setMessages((prev) => prev.concat(lastMessageData));
         }
     }, [lastMessage, setMessages]);
 
@@ -77,12 +69,11 @@ function ChatView() {
 
     useEffect(() => {
         // load all messages on first load
-        (async () => {
             console.log('Fetching latest messages')
-            const latestMessages = (await RestApi.getAllMessages())
-                .sort((messageA, messageB) => sortByStringAsc(messageA.sentAt, messageB.sentAt))
-            setMessages(latestMessages)
-        })()
+            RestApi.getAllMessages().then(messages => {
+                messages.sort((messageA, messageB) => sortByStringAsc(messageA.sentAt, messageB.sentAt))
+                setMessages(messages.map(message => ({ messageType: 'MESSAGE', messageProps: message } as RecieveMessage)))
+            })
     }, [])
 
     return (<div className="ChatView">

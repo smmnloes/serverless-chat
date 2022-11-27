@@ -1,7 +1,7 @@
 import { APIGatewayProxyResultV2, APIGatewayProxyWebsocketEventV2, APIGatewayProxyWebsocketHandlerV2 } from 'aws-lambda'
 import { ApiGatewayManagementApi, DynamoDB } from 'aws-sdk';
 import { AttributeMap } from 'aws-sdk/clients/dynamodb';
-import { RecieveMessageProps, SendMessageContainer, StoredMessageProps } from '../../../../common/websocket-types/chat-message';
+import { RecieveMessage, SendMessageContainer, StoredMessageProps } from '../../../../common/websocket-types/chat-message';
 import { ConnectionTableItem } from '../../datamodel/connection-table';
 import { scanComplete } from '../../util/dynamodb';
 import { randomUUID } from 'crypto'
@@ -58,7 +58,7 @@ export const handler: APIGatewayProxyWebsocketHandlerV2 = async (event: APIGatew
         await Promise.all(connectedClientIds.map(connectionId => callbackAPI.postToConnection({
             ConnectionId: connectionId, Data: JSON.stringify({
                 messageType: 'MESSAGE', messageProps: { from: messageProps.from, to: messageProps.to, message: incomingMessage, sentAt, id }
-            } as RecieveMessageProps)
+            } as RecieveMessage)
         }).promise()));
         console.log('Posted to connections');
         return { statusCode: 200 };
@@ -86,7 +86,7 @@ export const handler: APIGatewayProxyWebsocketHandlerV2 = async (event: APIGatew
         await callbackAPI.postToConnection({
             ConnectionId: recipientConnectionId, Data: JSON.stringify({
                 messageType: 'MESSAGE', messageProps: { from: messageProps.from, to: messageProps.to, message: incomingMessage, sentAt, id }
-            } as RecieveMessageProps)
+            } as RecieveMessage)
         }).promise()
 
         console.log('Posted to connections');

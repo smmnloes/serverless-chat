@@ -9,7 +9,7 @@ export type SendMessageProps = {
     message: string, from: string, to: 'all' | string
 }
 
-export type RecieveMessageProps = {
+export type RecieveMessage = {
     messageType: 'MESSAGE',
     messageProps: StoredMessageProps
 }
