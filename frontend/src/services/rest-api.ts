@@ -12,5 +12,11 @@ export const RestApi = {
         return fetch(`${baseUrlRest}user/${username}`, {
             method: 'GET', mode: 'cors'
         }).then(result => result.status === 200)
+    },
+    getConnectedUsers: async (): Promise<string[]> => {
+        return fetch(`${baseUrlRest}user`, {
+            method: 'GET', mode: 'cors'
+        }).then(result => result.json())
+            .then(json => json.connectedUserNames as string[])
     }
 }

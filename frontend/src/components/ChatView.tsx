@@ -9,6 +9,7 @@ import { messageTransformer } from "../services/messageTransformer";
 import { RestApi } from "../services/rest-api";
 import { sortByStringAsc } from "../util/sort";
 import './ChatView.css';
+import UserList from './UserList';
 
 function ChatView() {
     const location = useLocation()
@@ -69,11 +70,11 @@ function ChatView() {
 
     useEffect(() => {
         // load all messages on first load
-            console.log('Fetching latest messages')
-            RestApi.getAllMessages().then(messages => {
-                messages.sort((messageA, messageB) => sortByStringAsc(messageA.sentAt, messageB.sentAt))
-                setMessages(messages.map(message => ({ messageType: 'MESSAGE', messageProps: message } as RecieveMessage)))
-            })
+        console.log('Fetching latest messages')
+        RestApi.getAllMessages().then(messages => {
+            messages.sort((messageA, messageB) => sortByStringAsc(messageA.sentAt, messageB.sentAt))
+            setMessages(messages.map(message => ({ messageType: 'MESSAGE', messageProps: message } as RecieveMessage)))
+        })
     }, [])
 
     return (<div className="ChatView">
@@ -82,8 +83,11 @@ function ChatView() {
             <p>Status: <b style={connectionStatusStyle}>{connectionStatus}</b></p>
         </div>
         <div className='MessageAndControls'>
-            <div className="MessageView" id="MessageView">
-                <ul>{messages.map(messageTransformer)}</ul>
+            <div className='MessageViewUserList'>
+                <div className="MessageView" id="MessageView">
+                    <ul>{messages.map(messageTransformer)}</ul>
+                </div>
+                <UserList readyState={readyState}></UserList>
             </div>
             <div className='BottomControls'>
                 <input id="messageInput" type="text"

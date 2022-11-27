@@ -2,7 +2,7 @@
     border-style: solid;
     border-radius: 0.5rem;
     margin: 5rem auto 5rem auto;
-    padding: 1rem;
+    padding: 0.3rem;
     max-width: 40rem;
 }
 
@@ -28,21 +28,28 @@
 
 
 .MessageAndControls {
-    margin: 1rem;
+    margin: 0.1rem;
 }
 
 .MessageView {
     height: 30rem;
+
     overflow-y: auto;
     border: 1px solid;
     border-radius: 0.5rem;
-    margin: auto;
+    width: 80%;
+    margin-right: 0.3rem;
 
     text-align: left;
     padding: 1rem;
 
 }
 
+.MessageViewUserList {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+}
 
 .MessageView ul {
     list-style: none;

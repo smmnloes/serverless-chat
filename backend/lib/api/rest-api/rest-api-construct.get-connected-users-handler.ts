@@ -1,7 +1,7 @@
-import {APIGatewayProxyResultV2} from 'aws-lambda'
-import {AttributeMap} from 'aws-sdk/clients/dynamodb';
-import {ConnectionTableItem} from '../../datamodel/connection-table';
-import {scanComplete} from '../../util/dynamodb';
+import { APIGatewayProxyResultV2 } from 'aws-lambda'
+import { AttributeMap } from 'aws-sdk/clients/dynamodb';
+import { ConnectionTableItem } from '../../datamodel/connection-table';
+import { scanComplete } from '../../util/dynamodb';
 
 
 export const handler = async (/*event: APIGatewayProxyEvent*/): Promise<APIGatewayProxyResultV2> => {
@@ -10,6 +10,10 @@ export const handler = async (/*event: APIGatewayProxyEvent*/): Promise<APIGatew
     const connectedUserNames = (await scanComplete({ TableName: connectionTable })).map((item: AttributeMap) => (item as ConnectionTableItem).name);
     console.log('Connected users: ' + connectedUserNames);
 
-    return { statusCode: 200, body: JSON.stringify({ connectedUserNames }) };
+    return {
+        statusCode: 200,
+        headers: { 'Access-Control-Allow-Origin': '*' },
+        body: JSON.stringify({ connectedUserNames })
+    };
 
 }

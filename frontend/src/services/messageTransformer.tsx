@@ -9,7 +9,7 @@ export const messageTransformer = (message: RecieveMessage | UserConnectionMessa
         const sentAtDate = new Date(messageProps.sentAt);
         const dateTimeString = `${sentAtDate.getDate()}.${sentAtDate.getMonth() + 1}., ${pad(sentAtDate.getHours(), 2)}:${pad(sentAtDate.getMinutes(), 2)}`
         return <li key={messageProps.id}><b>{messageProps.from} </b>
-            <span>({dateTimeString})</span>: {messageProps.message}
+            <span>({dateTimeString})</span>:<br/>{messageProps.message}
         </li>
     } else if (message.messageType === 'USER_CONNECTED' || message.messageType === 'USER_DISCONNECTED') {
         const userConnectionMessage = message as UserConnectionMessage

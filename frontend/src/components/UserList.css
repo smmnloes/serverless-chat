@@ -1,0 +1,16 @@
+.UserList ul {
+    list-style: none;
+    padding: 0;
+}
+
+.UserList {
+   
+    overflow-y: auto;
+    border: 1px solid;
+    border-radius: 0.5rem;
+    width: 20%;
+
+    text-align: left;
+    padding: 1rem;
+
+}
