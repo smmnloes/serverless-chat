@@ -37,6 +37,8 @@ export class WSApiConstruct extends Construct {
 
 
         webSocketApi.grantManageConnections(messageHandler)
+        webSocketApi.grantManageConnections(connectHandler)
+        webSocketApi.grantManageConnections(disconnectHandler)
 
         const stage = new WebSocketStage(this, 'prod', {
             webSocketApi, stageName: 'prod', autoDeploy: true, throttle: {
@@ -45,6 +47,8 @@ export class WSApiConstruct extends Construct {
         });
 
         messageHandler.addEnvironment('CALLBACK_URL', stage.callbackUrl)
+        connectHandler.addEnvironment('CALLBACK_URL', stage.callbackUrl)
+        disconnectHandler.addEnvironment('CALLBACK_URL', stage.callbackUrl)
 
         const chatWSApiDomainName = `chat-ws-api.${props.siteDomain}`;
         const domainName = new DomainName(this, 'DomainName', {

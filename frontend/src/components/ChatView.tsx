@@ -1,14 +1,14 @@
 import React, { useEffect, useState } from 'react';
 import { useLocation } from 'react-router';
-import { Link } from 'react-router-dom';
-import './ChatView.css';
-import { SendMessageContainer, StoredMessageProps } from "../../../common/websocket-types/chat-message";
+import useWebSocket from "react-use-websocket";
+import { RecieveMessageProps, SendMessageContainer, StoredMessageProps } from "../../../common/websocket-types/chat-message";
+import { UserConnectionMessage } from "../../../common/websocket-types/user-connection-message";
+import { connectionStatusColors, connectionStatusText } from '../config/connectionStatus';
+import { baseUrlWebsocket } from "../config/urls";
 import { messageTransformer } from "../services/messageTransformer";
-import useWebSocket, { ReadyState } from "react-use-websocket";
 import { RestApi } from "../services/rest-api";
 import { sortByStringAsc } from "../util/sort";
-import { baseUrlWebsocket } from "../config/urls";
-import { connectionStatusColors, connectionStatusText } from '../config/connectionStatus';
+import './ChatView.css';
 
 function ChatView() {
     const location = useLocation()
@@ -47,7 +47,17 @@ function ChatView() {
 
     useEffect(() => {
         if (lastMessage !== null) {
-            setMessages((prev) => prev.concat(JSON.parse(lastMessage.data)));
+            const lastMessageData = JSON.parse(lastMessage.data)
+            console.log(JSON.stringify(lastMessageData))
+            if (lastMessageData.messageType === 'USER_CONNECTED') {
+                console.log("User connected: " + (lastMessageData as UserConnectionMessage).username)
+            }
+            if (lastMessageData.messageType === 'USER_DISCONNECTED') {
+                console.log("User disconnected: " + (lastMessageData as UserConnectionMessage).username)
+            }
+            if (lastMessageData.messageType === 'MESSAGE') {
+                setMessages((prev) => prev.concat((lastMessageData as RecieveMessageProps).messageProps));
+            }
         }
     }, [lastMessage, setMessages]);
 
