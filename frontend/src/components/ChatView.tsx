@@ -16,6 +16,7 @@ function ChatView() {
     const { name } = location.state
     const [message, setMessage] = useState("")
     const [messages, setMessages] = useState<(RecieveMessage | UserConnectionMessage)[]>([])
+    const [lastUserConnectionMessage, setLastUserConnectionMessage] = useState<UserConnectionMessage | null>(null)
 
     function messageChangeHandler(e: React.FormEvent<HTMLInputElement>) {
         setMessage(e.currentTarget.value)
@@ -51,6 +52,9 @@ function ChatView() {
             const lastMessageData = JSON.parse(lastMessage.data)
             console.log(JSON.stringify(lastMessageData))
             setMessages((prev) => prev.concat(lastMessageData));
+            if (lastMessageData.messageType === 'USER_CONNECTED' || lastMessageData.messageType === 'USER_DISCONNECTED') {
+                setLastUserConnectionMessage(lastMessageData)
+            }
         }
     }, [lastMessage, setMessages]);
 
@@ -87,7 +91,7 @@ function ChatView() {
                 <div className="MessageView" id="MessageView">
                     <ul>{messages.map(messageTransformer)}</ul>
                 </div>
-                <UserList readyState={readyState} lastMessage={JSON.parse(lastMessage?.data || null)}></UserList>
+                <UserList readyState={readyState} lastUserConnectionMessage={lastUserConnectionMessage}></UserList>
             </div>
             <div className='BottomControls'>
                 <input id="messageInput" type="text"

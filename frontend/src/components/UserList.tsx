@@ -1,15 +1,14 @@
 import React, { useEffect, useState } from 'react';
+import { ReadyState } from 'react-use-websocket';
 import { v4 as uuid } from 'uuid';
+import { UserConnectionMessage } from '../../../common/websocket-types/user-connection-message';
 import { RestApi } from '../services/rest-api';
 import './UserList.css';
-import { ReadyState } from 'react-use-websocket'
-import { RecieveMessage } from '../../../common/websocket-types/chat-message';
-import { UserConnectionMessage } from '../../../common/websocket-types/user-connection-message';
 
-function UserList(props: { readyState: ReadyState, lastMessage: RecieveMessage | UserConnectionMessage }) {
+function UserList(props: { readyState: ReadyState, lastUserConnectionMessage: UserConnectionMessage | null}) {
 
     const [connectedUsers, setConnectedUsers] = useState<string[]>([])
-
+    
     useEffect(() => {
         console.log('ready state change')
         if (props.readyState === ReadyState.OPEN) {
@@ -19,18 +18,17 @@ function UserList(props: { readyState: ReadyState, lastMessage: RecieveMessage |
 
     useEffect(() => {
         console.log('Updating user list')
-        const lastMessage = props.lastMessage;
+        const lastMessage = props.lastUserConnectionMessage;
         console.log(lastMessage)
-        if (lastMessage && (lastMessage.messageType === 'USER_CONNECTED' || lastMessage.messageType === 'USER_DISCONNECTED')) {
-            const userConnectedMessage = props.lastMessage as UserConnectionMessage
-            if (props.lastMessage.messageType === 'USER_DISCONNECTED') {
-                setConnectedUsers(prev => { console.log('Prev users' + prev); return prev.filter(username => username !== userConnectedMessage.username) })
+        if (lastMessage) {
+            if (lastMessage.messageType === 'USER_DISCONNECTED') {
+                setConnectedUsers(prev => { return prev.filter(username => username !== lastMessage.username) })
             }
-            if (props.lastMessage.messageType === 'USER_CONNECTED') {
-                setConnectedUsers(prev => [...prev, userConnectedMessage.username])
+            if (lastMessage.messageType === 'USER_CONNECTED') {
+                setConnectedUsers(prev => [...prev, lastMessage.username])
             }
         }
-    }, [props.lastMessage])
+    }, [props.lastUserConnectionMessage?.messageType, props.lastUserConnectionMessage?.username])
 
     return (<div className="UserList">
         <p className="UserHeading"><b>Users</b></p>
