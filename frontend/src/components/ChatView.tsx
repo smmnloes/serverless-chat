@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useInsertionEffect, useState } from 'react';
 import { useLocation } from 'react-router';
 import useWebSocket from "react-use-websocket";
 import { RecieveMessage, SendMessageContainer, StoredMessageProps } from "../../../common/websocket-types/chat-message";

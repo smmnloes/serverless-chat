@@ -11,6 +11,7 @@ function UserList(props: { readyState: ReadyState, lastMessage: RecieveMessage |
     const [connectedUsers, setConnectedUsers] = useState<string[]>([])
 
     useEffect(() => {
+        console.log('ready state change')
         if (props.readyState === ReadyState.OPEN) {
             RestApi.getConnectedUsers().then(users => setConnectedUsers(users))
         }
@@ -22,10 +23,10 @@ function UserList(props: { readyState: ReadyState, lastMessage: RecieveMessage |
         console.log(lastMessage)
         if (lastMessage && (lastMessage.messageType === 'USER_CONNECTED' || lastMessage.messageType === 'USER_DISCONNECTED')) {
             const userConnectedMessage = props.lastMessage as UserConnectionMessage
-            if (props.lastMessage.messageType = 'USER_DISCONNECTED') {
-                setConnectedUsers(prev => prev.filter(username => username !== userConnectedMessage.username))
+            if (props.lastMessage.messageType === 'USER_DISCONNECTED') {
+                setConnectedUsers(prev => { console.log('Prev users' + prev); return prev.filter(username => username !== userConnectedMessage.username) })
             }
-            if (props.lastMessage.messageType = 'USER_CONNECTED') {
+            if (props.lastMessage.messageType === 'USER_CONNECTED') {
                 setConnectedUsers(prev => [...prev, userConnectedMessage.username])
             }
         }
