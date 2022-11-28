@@ -1,8 +1,7 @@
-import React, { useEffect, useInsertionEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useLocation } from 'react-router';
 import useWebSocket from "react-use-websocket";
-import { RecieveMessage, SendMessageContainer, StoredMessageProps } from "../../../common/websocket-types/chat-message";
-import { UserConnectionMessage } from "../../../common/websocket-types/user-connection-message";
+import { RecieveMessage, SendMessageContainer, UserConnectionMessage } from "../../../common/websocket-types/chat-message";
 import { connectionStatusColors, connectionStatusText } from '../config/connectionStatus';
 import { baseUrlWebsocket } from "../config/urls";
 import { messageTransformer } from "../services/messageTransformer";
@@ -49,7 +48,7 @@ function ChatView() {
 
     useEffect(() => {
         if (lastMessage !== null) {
-            const lastMessageData = JSON.parse(lastMessage.data)
+            const lastMessageData = JSON.parse(lastMessage.data) as UserConnectionMessage | RecieveMessage
             console.log(JSON.stringify(lastMessageData))
             setMessages((prev) => prev.concat(lastMessageData));
             if (lastMessageData.messageType === 'USER_CONNECTED' || lastMessageData.messageType === 'USER_DISCONNECTED') {

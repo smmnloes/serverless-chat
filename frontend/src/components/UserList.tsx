@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { ReadyState } from 'react-use-websocket';
 import { v4 as uuid } from 'uuid';
-import { UserConnectionMessage } from '../../../common/websocket-types/user-connection-message';
+import { UserConnectionMessage } from '../../../common/websocket-types/chat-message';
 import { RestApi } from '../services/rest-api';
 import './UserList.css';
 

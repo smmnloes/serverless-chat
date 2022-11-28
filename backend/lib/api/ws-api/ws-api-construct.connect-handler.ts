@@ -3,7 +3,7 @@ import { ApiGatewayManagementApi, DynamoDB } from 'aws-sdk';
 import { AttributeMap } from 'aws-sdk/clients/dynamodb';
 import { ConnectionTableItem } from '../../datamodel/connection-table';
 import { scanComplete } from '../../util/dynamodb';
-import { UserConnectionMessage } from '../../../../common/websocket-types/user-connection-message';
+import { UserConnectionMessage } from '../../../../common/websocket-types/chat-message';
 
 export const handler = async (event: APIGatewayProxyEvent): Promise<APIGatewayProxyResultV2> => {
     console.log(JSON.stringify(event, null, 4))

@@ -1,20 +1,17 @@
 import React from "react";
-import { RecieveMessage, StoredMessageProps } from "../../../common/websocket-types/chat-message";
-import { UserConnectionMessage } from "../../../common/websocket-types/user-connection-message";
 import { v4 as uuid } from 'uuid';
+import { RecieveMessage, UserConnectionMessage } from "../../../common/websocket-types/chat-message";
 
 export const messageTransformer = (message: RecieveMessage | UserConnectionMessage) => {
     if (message.messageType === 'MESSAGE') {
-        const messageProps = message.messageProps as StoredMessageProps
+        const messageProps = message.messageProps;
         const sentAtDate = new Date(messageProps.sentAt);
         const dateTimeString = `${sentAtDate.getDate()}.${sentAtDate.getMonth() + 1}., ${pad(sentAtDate.getHours(), 2)}:${pad(sentAtDate.getMinutes(), 2)}`
         return <li key={messageProps.id}><b>{messageProps.from} </b>
             <span>({dateTimeString})</span>:<br/>{messageProps.message}
         </li>
     } else if (message.messageType === 'USER_CONNECTED' || message.messageType === 'USER_DISCONNECTED') {
-        const userConnectionMessage = message as UserConnectionMessage
-        const messageType = message.messageType
-        return <li key={uuid()}><i>User {userConnectionMessage.username} {messageType === 'USER_CONNECTED' ? 'connected' : 'disconnected'}</i></li>
+        return <li key={uuid()}><i>User {message.username} {message.messageType === 'USER_CONNECTED' ? 'connected' : 'disconnected'}</i></li>
     }
 
 }
